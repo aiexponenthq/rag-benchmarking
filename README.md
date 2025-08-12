@@ -29,7 +29,7 @@ By the end of this tutorial you will be able to:
 - Packaging: Docker compose (internal port 5000), conda for local dev
 
 ## Local development
-- Create a conda environment on macOS at your preferred path (e.g., `/soot/ajay/conda_envs/rag_agentic`).
+- Create a conda environment on macOS at your preferred path (e.g., `~/conda_envs/rag_agentic`).
 - Install dependencies (listed in `pyproject.toml`).
 - Secrets and endpoints go in `.env` (use `.env.example` as a template).
 - Run tests with `pytest`. Lint with `ruff`, format with `black`, type-check with `mypy`.
