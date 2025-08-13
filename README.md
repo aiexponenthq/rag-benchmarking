@@ -1,3 +1,11 @@
+<img src="assets/banner.png" alt="Ajay Pundhir — AiExponent" width="100%" />
+
+> Building responsible, enterprise-scale AI that delivers measurable business value — from governance to platforms to production.
+
+[![Consult Now](https://img.shields.io/badge/Consult%20Now-FAD232?style=for-the-badge&logo=bolt&logoColor=004141&labelColor=004141)](https://aiexponent.com/blog/)
+[![Connect on LinkedIn](https://img.shields.io/badge/Connect%20on%20LinkedIn-009292?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/ajaypundhir)
+[![Visit my website](https://img.shields.io/badge/Visit%20my%20website-009292?style=for-the-badge&logo=firefox&logoColor=white)](https://aiexponent.com)
+
 # Agentic RAG Benchmarking POC
 
 This tutorial-style repository teaches you how to build, evaluate, and productionize an Agentic RAG system using open-source tools on a Mac (CPU) with cloud backends. It complements and operationalizes the practices in the article: [The Complete Enterprise Guide to RAG Evaluation and Benchmarking](https://aiexponent.com/the-complete-enterprise-guide-to-rag-evaluation-and-benchmarking/).
