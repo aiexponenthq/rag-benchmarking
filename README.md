@@ -1,11 +1,5 @@
 ![Banner](https://github.com/apundhir/apundhir/raw/main/assets/github-banner.jpg) 
 
-> Building responsible, enterprise-scale AI that delivers measurable business value — from governance to platforms to production.
-
-[![Consult Now](https://img.shields.io/badge/Consult%20Now-FAD232?style=for-the-badge&logo=bolt&logoColor=004141&labelColor=004141)](https://aiexponent.com/blog/)
-[![Connect on LinkedIn](https://img.shields.io/badge/Connect%20on%20LinkedIn-009292?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/ajaypundhir)
-[![Visit my website](https://img.shields.io/badge/Visit%20my%20website-009292?style=for-the-badge&logo=firefox&logoColor=white)](https://aiexponent.com)
-
 # Agentic RAG Benchmarking POC
 
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
