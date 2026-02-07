@@ -1,4 +1,4 @@
-<img src="assets/banner.png" alt="Ajay Pundhir — AiExponent" width="100%" />
+![Banner](https://github.com/apundhir/apundhir/raw/main/assets/Github%20Banner.jpg)
 
 > Building responsible, enterprise-scale AI that delivers measurable business value — from governance to platforms to production.
 
