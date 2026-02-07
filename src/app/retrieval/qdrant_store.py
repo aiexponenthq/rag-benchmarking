@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any
 
 import numpy as np
 from qdrant_client import QdrantClient
@@ -17,13 +17,13 @@ def get_qdrant_client() -> QdrantClient:
 
 
 def ensure_collection(
-    client: QdrantClient, collection: str, vector_size: int, desired_vector_name: Optional[str] = None
-) -> tuple[str, Optional[str]]:
+    client: QdrantClient, collection: str, vector_size: int, desired_vector_name: str | None = None
+) -> tuple[str, str | None]:
     """Ensure collection exists and return (collection_name, vector_name_if_named).
 
-    If the collection exists, attempt to detect if it uses a named-vector schema and return the name.
-    If it does not exist, create either a single-vector collection or a named-vector collection
-    if desired_vector_name is provided.
+    If the collection exists, attempt to detect if it uses a named-vector schema and return the 
+    name. If it does not exist, create either a single-vector collection or a named-vector 
+    collection if desired_vector_name is provided.
     """
     existing = [c.name for c in client.get_collections().collections]
     if collection in existing:
@@ -98,9 +98,7 @@ def _detect_named_vector_from_dump(client: QdrantClient, collection: str) -> str
     info = client.get_collection(collection)
     data = info.model_dump(exclude_none=True)  # type: ignore[attr-defined]
     vectors = (
-        data.get("config", {}).get("params", {}).get("vectors")
-        if isinstance(data, dict)
-        else None
+        data.get("config", {}).get("params", {}).get("vectors") if isinstance(data, dict) else None
     )
     if isinstance(vectors, dict):
         if "size" in vectors:
@@ -116,13 +114,14 @@ def upsert_points(
     client: QdrantClient,
     collection: str,
     embeddings: np.ndarray,
-    payloads: List[Dict[str, Any]],
-    vector_name: Optional[str] = None,
+    payloads: list[dict[str, Any]],
+    vector_name: str | None = None,
 ) -> None:
     assert embeddings.shape[0] == len(payloads)
     points = []
     from uuid import uuid4
-    for idx, (vec, payload) in enumerate(zip(embeddings, payloads)):
+
+    for _idx, (vec, payload) in enumerate(zip(embeddings, payloads, strict=True)):
         if vector_name:
             points.append(
                 qmodels.PointStruct(
@@ -143,9 +142,9 @@ def search(
     collection: str,
     query_vector: np.ndarray,
     top_k: int = 5,
-    filters: Optional[qmodels.Filter] = None,
-    vector_name: Optional[str] = None,
-) -> List[qmodels.ScoredPoint]:
+    filters: qmodels.Filter | None = None,
+    vector_name: str | None = None,
+) -> list[qmodels.ScoredPoint]:
     qv: Any = (vector_name, query_vector.tolist()) if vector_name else query_vector.tolist()
     return client.search(
         collection_name=collection,
@@ -154,5 +153,3 @@ def search(
         query_filter=filters,
         with_payload=True,
     )
-
-

@@ -8,6 +8,13 @@
 
 # Agentic RAG Benchmarking POC
 
+![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
+![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)
+![Status](https://img.shields.io/badge/status-release%20candidate-orange.svg)
+
+A professional, enterprise-ready Proof of Concept for benchmarking Access-Control aware RAG pipelines.
+This project demonstrates a production-grade architecture using **FastAPI**, **Qdrant**, and **LLMs (Gemini/OpenAI)** with a focus on security, observability, and code quality.
+
 This tutorial-style repository teaches you how to build, evaluate, and productionize an Agentic RAG system using open-source tools on a Mac (CPU) with cloud backends. It complements and operationalizes the practices in the article: [The Complete Enterprise Guide to RAG Evaluation and Benchmarking](https://aiexponent.com/the-complete-enterprise-guide-to-rag-evaluation-and-benchmarking/).
 
 ## Goals
@@ -73,6 +80,9 @@ Docker (cloud defaults):
 ```bash
 HOST_PORT=5001 docker compose up -d
 ```
+
+> [!IMPORTANT]
+> **Security**: The API is protected by an API Key. You must set `API_KEY` in your `.env` file and include `X-API-Key: <your-key>` in all requests. See [DEPLOYMENT.md](DEPLOYMENT.md) for details.
 
 Health:
 

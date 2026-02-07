@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import time
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Iterator
 
 
 @contextmanager
@@ -15,5 +15,3 @@ def timer() -> Iterator[dict[str, float]]:
     finally:
         end = time.perf_counter()
         data["elapsed_ms"] = (end - start) * 1000.0
-
-

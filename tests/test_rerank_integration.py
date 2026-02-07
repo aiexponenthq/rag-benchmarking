@@ -42,5 +42,3 @@ def test_query_rerank_flag(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     data = resp.json()
     # With reversed order, top should be 'c2'
     assert data["citations"][0]["text"] == "c2"
-
-

@@ -31,5 +31,3 @@ def test_evaluate_smoke(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     data = resp.json()
     assert "result" in data and "metrics" in data["result"]
     assert data["result"]["metrics"]["faithfulness"] == 0.9
-
-

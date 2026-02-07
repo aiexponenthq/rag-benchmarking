@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from typing import Dict, List, Optional
 
 import requests
 
@@ -51,10 +50,15 @@ class LLMClient:
                 {"role": "user", "content": user_prompt},
             ],
         }
-        resp = requests.post(url, headers=headers, json=payload, timeout=60)
-        resp.raise_for_status()
-        data = resp.json()
-        return data["choices"][0]["message"]["content"]
+        try:
+            resp = requests.post(url, headers=headers, json=payload, timeout=60)
+            resp.raise_for_status()
+            data = resp.json()
+            return data["choices"][0]["message"]["content"]
+        except Exception as e:
+            from app.exceptions import LLMError
+
+            raise LLMError(f"OpenAI API error: {str(e)}") from e
 
     def _generate_gemini(self, system_prompt: str, user_prompt: str) -> str:
         # Gemini v1beta generateContent endpoint
@@ -74,9 +78,17 @@ class LLMClient:
                 "maxOutputTokens": self.max_tokens,
             },
         }
-        resp = requests.post(url, headers=headers, data=json.dumps(payload), timeout=60)
-        resp.raise_for_status()
-        data = resp.json()
-        return data["candidates"][0]["content"]["parts"][0]["text"]
+        try:
+            resp = requests.post(url, headers=headers, data=json.dumps(payload), timeout=60)
+            resp.raise_for_status()
+            data = resp.json()
+            # Safety checks for empty response
+            if "candidates" not in data or not data["candidates"]:
+                if "promptFeedback" in data:
+                    raise ValueError(f"Blocked by safety settings: {data['promptFeedback']}")
+                raise ValueError("No candidates returned")
+            return data["candidates"][0]["content"]["parts"][0]["text"]
+        except Exception as e:
+            from app.exceptions import LLMError
 
-
+            raise LLMError(f"Gemini API error: {str(e)}") from e

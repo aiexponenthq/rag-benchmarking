@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 try:
     from FlagEmbedding import FlagReranker
@@ -17,11 +17,9 @@ class CrossEncoderReranker:
         # use_fp16=True is fine on CPU via bfloat16 emulation; can set False if issues
         self.reranker = FlagReranker(model_name, use_fp16=True, device=device)
 
-    def rerank(self, query: str, chunks: List[Dict[str, Any]], top_k: int) -> List[Dict[str, Any]]:
-        pairs: List[Tuple[str, str]] = [(query, c.get("text", "")) for c in chunks]
+    def rerank(self, query: str, chunks: list[dict[str, Any]], top_k: int) -> list[dict[str, Any]]:
+        pairs: list[tuple[str, str]] = [(query, c.get("text", "")) for c in chunks]
         scores = self.reranker.compute_score(pairs, normalize=True)
-        scored = [dict(c, rerank_score=float(s)) for c, s in zip(chunks, scores)]
+        scored = [dict(c, rerank_score=float(s)) for c, s in zip(chunks, scores, strict=True)]
         scored.sort(key=lambda x: x.get("rerank_score", 0.0), reverse=True)
         return scored[:top_k]
-
-

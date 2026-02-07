@@ -1,34 +1,33 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 import app.eval.ragas_runner as rr
 from app.eval.reporting import write_report_files
-from pathlib import Path
-
 
 router = APIRouter(prefix="/v1", tags=["evaluate"])
 
 
 class EvalSample(BaseModel):
     question: str
-    contexts: List[str] = Field(default_factory=list)
+    contexts: list[str] = Field(default_factory=list)
     answer: str
-    ground_truths: List[str] = Field(default_factory=list)
+    ground_truths: list[str] = Field(default_factory=list)
 
 
 class EvalRequest(BaseModel):
-    samples: List[EvalSample]
-    metrics: List[str] | None = None
-    out_json: Optional[str] = None
-    out_md: Optional[str] = None
+    samples: list[EvalSample]
+    metrics: list[str] | None = None
+    out_json: str | None = None
+    out_md: str | None = None
 
 
 @router.post("/evaluate")
-def post_evaluate(req: EvalRequest) -> Dict[str, Any]:
+def post_evaluate(req: EvalRequest) -> dict[str, Any]:
     try:
         samples = [s.model_dump() for s in req.samples]
         result = rr.run_evaluation(samples, metrics=req.metrics)
@@ -40,5 +39,3 @@ def post_evaluate(req: EvalRequest) -> Dict[str, Any]:
         return {"result": result, "written": paths}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
-
-

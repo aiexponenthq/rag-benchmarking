@@ -21,6 +21,7 @@ def test_query_smoke(monkeypatch) -> None:  # type: ignore[no-untyped-def]
 
     # Monkeypatch the service function used by the router
     import app.retrieval.service as svc
+
     monkeypatch.setattr(svc, "retrieve_top_chunks", fake_retrieve_top_chunks)
 
     # Also patch LLM client to avoid external calls
@@ -41,5 +42,3 @@ def test_query_smoke(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     assert "timings_ms" in data
     assert "tokens" in data
     assert data["citations"][0]["source_id"] == "s.txt"
-
-

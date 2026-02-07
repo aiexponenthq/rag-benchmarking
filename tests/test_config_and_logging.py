@@ -16,5 +16,3 @@ def test_json_logger_configures_root_logger() -> None:
     logger = configure_json_logging("INFO")
     assert isinstance(logger, logging.Logger)
     assert logger.level == logging.INFO
-
-

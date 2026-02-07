@@ -12,5 +12,3 @@ def test_embeddings_shape_and_dtype() -> None:
     assert vecs.shape[0] == 2
     assert vecs.dtype == np.float32
     assert not np.isnan(vecs).any()
-
-

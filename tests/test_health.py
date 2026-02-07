@@ -16,5 +16,3 @@ def test_health_endpoint_structure() -> None:
     assert "version" in data
     assert "model" in data and "providers" in data["model"]
     assert "vectordb" in data and "provider" in data["vectordb"]
-
-

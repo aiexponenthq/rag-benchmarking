@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, List
 
 
 @dataclass
@@ -15,7 +14,7 @@ class TextChunk:
 
 def recursive_character_chunk(
     text: str, *, chunk_size: int = 1000, chunk_overlap: int = 150, source_id: str
-) -> List[TextChunk]:
+) -> list[TextChunk]:
     """Split text into overlapping chunks.
 
     Parameters
@@ -36,7 +35,7 @@ def recursive_character_chunk(
     """
 
     assert chunk_size > 0 and chunk_overlap >= 0 and chunk_overlap < chunk_size
-    chunks: List[TextChunk] = []
+    chunks: list[TextChunk] = []
     start = 0
     index = 0
     while start < len(text):
@@ -48,5 +47,3 @@ def recursive_character_chunk(
         start = end - chunk_overlap
         index += 1
     return chunks
-
-

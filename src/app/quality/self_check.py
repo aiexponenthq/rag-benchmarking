@@ -1,19 +1,17 @@
 from __future__ import annotations
 
-from typing import List
-
 from app.llm.client import LLMClient
 
 
-def compute_groundedness(answer: str, contexts: List[str]) -> float:
+def compute_groundedness(answer: str, contexts: list[str]) -> float:
     """Compute a simple groundedness score in [0,1] using an LLM-as-judge prompt.
 
     This is a lightweight rubric: the judge must return only a float between 0 and 1.
     """
     rubric = (
-        "You are a strict evaluator. Given the CONTEXT and an ANSWER, return a single float between 0 and 1 "
-        "indicating how well the answer is directly supported by the context (1 = fully supported, 0 = unsupported). "
-        "Respond with only the number."
+        "You are a strict evaluator. Given the CONTEXT and an ANSWER, return a single float "
+        "between 0 and 1 indicating how well the answer is directly supported by the context "
+        "(1 = fully supported, 0 = unsupported). Respond with only the number."
     )
     ctx = "\n\n".join(contexts)
     user = f"CONTEXT:\n{ctx}\n\nANSWER:\n{answer}\n\nScore:"
@@ -28,5 +26,3 @@ def compute_groundedness(answer: str, contexts: List[str]) -> float:
         return val
     except Exception:
         return 0.0
-
-
