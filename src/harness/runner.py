@@ -100,8 +100,24 @@ class EvaluationRunner:
                 aggregate[m] = 1.0
                 per_sample_scores[m] = [1.0] * len(samples)
             elif m in _RELEVANT_IDS_REQUIRED:
-                # Already filtered above; shouldn't reach here
-                pass
+                from app.eval.retrieval_metrics import (
+                    precision_at_k, recall_at_k, mean_reciprocal_rank, ndcg_at_k
+                )
+                k = self.config.k
+                scores = []
+                for s in samples:
+                    relevant = set(s.relevant_doc_ids)
+                    retrieved = s.retrieved_doc_ids
+                    if m == "precision_at_k":
+                        scores.append(precision_at_k(retrieved, relevant, k))
+                    elif m == "recall_at_k":
+                        scores.append(recall_at_k(retrieved, relevant, k))
+                    elif m == "mrr":
+                        scores.append(mean_reciprocal_rank(retrieved, relevant))
+                    elif m == "ndcg_at_k":
+                        scores.append(ndcg_at_k(retrieved, relevant, k))
+                aggregate[m] = sum(scores) / len(scores) if scores else 0.0
+                per_sample_scores[m] = scores
             else:
                 logger.warning("Metric '%s' not yet implemented, skipping", m)
                 skipped.append(m)
