@@ -108,8 +108,9 @@ def run_evaluation(
     dataset = EvaluationDataset(samples=ragas_samples)
 
     # ------------------------------------------------------------------ #
-    # Configure judge LLM (Gemini via LangChain)                          #
+    # Configure judge LLM (LangChain wrapper for RAGAS 0.4.x)             #
     # ------------------------------------------------------------------ #
+    from app.config.settings import get_settings as _get_settings
     from langchain_google_genai import ChatGoogleGenerativeAI
     from ragas.llms import LangchainLLMWrapper
 
@@ -142,13 +143,34 @@ def run_evaluation(
         raise_exceptions=True,
     )
 
-    df = result.to_pandas()
+    import logging as _logging
+    import math as _math
+    _logger = _logging.getLogger(__name__)
+
+    try:
+        df = result.to_pandas()
+    except Exception as exc:
+        _logger.warning("RAGAS result.to_pandas() failed: %s — trying scores dict", exc)
+        # Fallback: try to read scores directly from the result object
+        scores = getattr(result, "scores", {}) or {}
+        aggregates = {m: float(scores.get(m, float("nan"))) for m in selected}
+        per_sample = {}
+        skipped = [m for m in all_requested if m not in selected]
+        return {
+            "metrics": {k: (None if _math.isnan(v) else v) for k, v in aggregates.items()},
+            "per_sample": per_sample,
+            "skipped_metrics": skipped,
+            "skip_reason": None,
+        }
+
     aggregates: dict[str, float] = {}
     per_sample: dict[str, list[float]] = {}
     for m in selected:
         if m in df.columns:
             vals = df[m].dropna().tolist()
-            aggregates[m] = float(df[m].mean()) if vals else float("nan")
+            mean_val = float(df[m].mean()) if vals else float("nan")
+            # Replace NaN with None so JSON serialises cleanly (NaN → null → None)
+            aggregates[m] = mean_val if not _math.isnan(mean_val) else None  # type: ignore[assignment]
             per_sample[m] = [float(v) for v in vals]
 
     skipped = [m for m in all_requested if m not in selected]
