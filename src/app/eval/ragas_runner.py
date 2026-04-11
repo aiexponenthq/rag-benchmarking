@@ -114,31 +114,23 @@ def run_evaluation(
     from langchain_google_genai import ChatGoogleGenerativeAI
     from ragas.llms import LangchainLLMWrapper
 
-    _settings = _get_settings()
-    gemini_api_key = _settings.gemini_api_key or os.getenv("GEMINI_API_KEY")
-    openai_api_key = _settings.openai_api_key or os.getenv("OPENAI_API_KEY")
-    llm_provider = (_settings.llm_provider or "").lower()
+    # Use app settings (reads from .env via pydantic-settings) then fall back
+    # to os.getenv for environments where the var is already exported
+    from app.config.settings import get_settings
+    gemini_api_key = get_settings().gemini_api_key or os.getenv("GEMINI_API_KEY")
+    if not gemini_api_key:
+        raise RuntimeError("GEMINI_API_KEY is required to run RAGAS with Gemini judge")
 
-    if llm_provider == "openai" and openai_api_key:
-        from langchain_openai import ChatOpenAI
-        _model = _settings.openai_model or "gpt-4o-mini"
-        ragas_llm = LangchainLLMWrapper(
-            ChatOpenAI(model=_model, api_key=openai_api_key, temperature=0.0)
-        )
-    elif gemini_api_key:
-        _model = _settings.gemini_model or "gemini-2.0-flash"
-        ragas_llm = LangchainLLMWrapper(
-            ChatGoogleGenerativeAI(
-                model=_model,
-                google_api_key=gemini_api_key,
-                temperature=0.0,
-            )
-        )
-    else:
-        raise RuntimeError(
-            "No LLM configured. Set GEMINI_API_KEY or OPENAI_API_KEY in .env "
-            "and set LLM_PROVIDER=gemini or LLM_PROVIDER=openai."
-        )
+    from app.config.settings import get_settings as _get_settings
+    _gemini_model = _get_settings().gemini_model or "gemini-2.0-flash"
+
+    langchain_llm = ChatGoogleGenerativeAI(
+        model=_gemini_model,
+        google_api_key=gemini_api_key,
+        temperature=0.0,
+    )
+    # ragas 0.4.x requires a wrapped LangchainLLMWrapper, not a raw LangChain LLM
+    ragas_llm = LangchainLLMWrapper(langchain_llm)
 
     # ------------------------------------------------------------------ #
     # Run evaluation                                                       #
@@ -148,7 +140,7 @@ def run_evaluation(
         metrics=metric_objs,
         llm=ragas_llm,
         show_progress=False,
-        raise_exceptions=False,
+        raise_exceptions=True,
     )
 
     import logging as _logging
