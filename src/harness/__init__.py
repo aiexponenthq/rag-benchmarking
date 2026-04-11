@@ -1,4 +1,5 @@
 from harness.protocol import RAGEvaluable, validate_evaluable
+from harness.result_store import ResultStore
 from harness.runner import EvaluationRunner
 from harness.schemas import (
     AgentTrace,
@@ -20,4 +21,5 @@ __all__ = [
     "RunConfig", "ToolCall", "ToolCallType",
     "RAGEvaluable", "validate_evaluable",
     "EvaluationRunner",
+    "ResultStore",
 ]
