@@ -4,6 +4,7 @@
 ![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)
 ![Status](https://img.shields.io/badge/status-v1.0.0--rc1-orange.svg)
 ![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2015-gold.svg)
+[![PyPI](https://img.shields.io/pypi/v/rag-benchmarking.svg)](https://pypi.org/project/rag-benchmarking/)
 
 **A framework-agnostic evaluation harness for RAG and agentic AI systems.**
 
@@ -18,6 +19,12 @@ Bring your own RAG pipeline — LangChain, LlamaIndex, or custom — and benchma
 ### Install
 
 ```bash
+# Install from PyPI (recommended)
+pip install rag-benchmarking
+
+# Or install from source
+git clone https://github.com/aiexponenthq/rag-benchmarking.git
+cd rag-benchmarking
 pip install -e ".[test]"
 ```
 
