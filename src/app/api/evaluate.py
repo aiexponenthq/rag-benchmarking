@@ -34,27 +34,55 @@ class EvalRequest(BaseModel):
 
 
 @router.post("/evaluate")
-async def post_evaluate(req: EvalRequest) -> dict[str, Any]:
-    """Async evaluate endpoint.
+async def post_evaluate(req: EvalRequest, _: str | None = Depends(get_api_key)) -> dict[str, Any]:
+    """Evaluate RAG samples against the requested metrics.
 
-    RAGAS evaluation is I/O-heavy (LLM API calls) but uses its own internal
-    asyncio via ``allow_nest_asyncio=True``.  We offload the entire call to a
-    thread-pool executor to keep the FastAPI event loop free and to avoid
-    nested-event-loop conflicts on Python 3.11.
+    Routes through EvaluationRunner which handles:
+    - Deterministic metrics (source_attribution_accuracy) — no LLM needed
+    - RAGAS metrics (faithfulness, answer_relevancy, context_precision, context_recall) — needs Gemini/OpenAI
+    - Retrieval metrics (precision_at_k, recall_at_k, mrr, ndcg_at_k) — no LLM needed
+
+    RAGAS calls are offloaded to a thread-pool executor to avoid blocking
+    the FastAPI event loop.
     """
+    from harness.runner import EvaluationRunner
+    from harness.schemas import EvalSample as HarnessEvalSample, RunConfig
+
     loop = asyncio.get_running_loop()
     try:
-        samples = [s.model_dump() for s in req.samples]
-        result: dict[str, Any] = await loop.run_in_executor(
-            None,
-            functools.partial(rr.run_evaluation, samples, metrics=req.metrics),
-        )
+        # Convert API samples to harness EvalSample objects
+        harness_samples = [
+            HarnessEvalSample(
+                question=s.question,
+                contexts=s.contexts,
+                answer=s.answer,
+                ground_truth=s.ground_truths[0] if s.ground_truths else None,
+            )
+            for s in req.samples
+        ]
+
+        config = RunConfig(metrics=req.metrics or ["faithfulness", "answer_relevancy"])
+        runner = EvaluationRunner(config)
+
+        result = await loop.run_in_executor(None, runner.evaluate, harness_samples)
+
+        # Convert BenchmarkReport to dict for response
+        output: dict[str, Any] = {
+            "metrics": result.metrics,
+            "skipped_metrics": result.skipped_metrics,
+            "skip_reasons": result.skip_reasons,
+            "run_id": result.run_id,
+            "n_samples": result.n_samples,
+        }
+
         paths = write_report_files(
-            result,
+            {"metrics": result.metrics, "per_sample": {}, "skipped_metrics": result.skipped_metrics},
             out_json=Path(req.out_json) if req.out_json else None,
             out_md=Path(req.out_md) if req.out_md else None,
         )
-        return {"result": result, "written": paths}
+        output["written"] = paths
+        return output
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
 
