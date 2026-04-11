@@ -120,8 +120,11 @@ def run_evaluation(
     if not gemini_api_key:
         raise RuntimeError("GEMINI_API_KEY is required to run RAGAS with Gemini judge")
 
+    from app.config.settings import get_settings as _get_settings
+    _gemini_model = _get_settings().gemini_model or "gemini-2.0-flash"
+
     langchain_llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
+        model=_gemini_model,
         google_api_key=gemini_api_key,
         temperature=0.0,
     )
@@ -136,7 +139,7 @@ def run_evaluation(
         metrics=metric_objs,
         llm=ragas_llm,
         show_progress=False,
-        raise_exceptions=False,
+        raise_exceptions=True,
     )
 
     df = result.to_pandas()
