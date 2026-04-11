@@ -42,7 +42,7 @@ async def post_evaluate(req: EvalRequest) -> dict[str, Any]:
     thread-pool executor to keep the FastAPI event loop free and to avoid
     nested-event-loop conflicts on Python 3.11.
     """
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     try:
         samples = [s.model_dump() for s in req.samples]
         result: dict[str, Any] = await loop.run_in_executor(
@@ -92,18 +92,18 @@ async def post_evaluate_agent(
             scores[metric] = r["score"]
             details[metric] = r
         elif metric == "agent_faithfulness":
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             r = await loop.run_in_executor(None, compute_agent_faithfulness, request.trace)
             scores[metric] = r["score"]
             details[metric] = r
         elif metric == "tool_call_accuracy":
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             r = await loop.run_in_executor(None, compute_tool_call_accuracy, request.trace)
             scores[metric] = r["score"]
             details[metric] = r
         elif metric == "retrieval_necessity":
             contexts = [c.content for c in request.trace.retrieved_chunks]
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             r = await loop.run_in_executor(
                 None,
                 functools.partial(
@@ -129,5 +129,15 @@ async def list_runs(
     _: str | None = Depends(get_api_key),
 ) -> list[dict[str, Any]]:
     """List recent evaluation runs from the result store."""
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, functools.partial(_result_store.list_runs, limit))
+
+
+@router.post("/runs/compare")
+async def compare_runs(
+    run_ids: list[str],
+    _: str | None = Depends(get_api_key),
+) -> dict[str, Any]:
+    """Compare metrics across multiple named runs."""
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, functools.partial(_result_store.compare_runs, run_ids))
