@@ -1,4 +1,5 @@
 import pytest
+import uuid
 from pydantic import ValidationError
 from harness.schemas import (
     EvalSample, AgentTrace, ToolCall, ReasoningStep,
@@ -12,6 +13,7 @@ def test_eval_sample_minimal():
         answer="RAG is a technique combining retrieval with generation.",
     )
     assert s.sample_id is not None
+    uuid.UUID(s.sample_id)  # raises ValueError if not a valid UUID
     assert s.ground_truth is None
 
 def test_eval_sample_with_ground_truth():
@@ -57,3 +59,8 @@ def test_run_config_defaults():
     config = RunConfig(metrics=["faithfulness"])
     assert config.judge_model == "gemini-1.5-flash"
     assert config.metric_group is None
+
+def test_eval_sample_unique_ids():
+    s1 = EvalSample(question="Q1?", contexts=["ctx"], answer="A1.")
+    s2 = EvalSample(question="Q2?", contexts=["ctx"], answer="A2.")
+    assert s1.sample_id != s2.sample_id
