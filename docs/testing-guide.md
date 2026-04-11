@@ -6,37 +6,44 @@ Step-by-step instructions to verify the rag-benchmarking tool is working correct
 
 ## What you need before starting
 
-| Requirement | Where to get it |
+| Requirement | Status |
 |---|---|
-| Python 3.11+ | python.org or `brew install python@3.11` |
-| A Gemini API key | aistudio.google.com → Get API key (free tier available) |
-| Git | Already installed on your machine |
+| Conda (Anaconda) | Already installed |
+| `rag_agentic` conda env | Already created for this repo |
+| A Gemini API key | Get one free at aistudio.google.com → Get API key |
 
 > **Note:** Qdrant (the vector database) is only needed if you want to test the built-in RAG pipeline. The evaluation harness itself works without it — you can skip those steps.
+
+> **Important:** Always work inside the `rag_agentic` conda environment. Never run `pip install` in your base/host Python — it will pollute your system.
 
 ---
 
 ## Part 1: Setup (5 minutes)
 
-### Step 1 — Clone and enter the repo
+### Step 1 — Enter the repo and activate the environment
 
 ```bash
 cd /Users/ajayp/Code/rag-benchmarking
+conda activate rag_agentic
 ```
 
-### Step 2 — Install dependencies
+Your terminal prompt should now show `(rag_agentic)` at the start.
+
+### Step 2 — Install dependencies into the conda env
 
 ```bash
 pip install -e ".[test]"
 ```
 
-You should see packages installing. It will take 2–3 minutes the first time.
+This installs into `rag_agentic` only — nothing touches your host Python. It takes 2–3 minutes the first time.
 
 **Verify it worked:**
 ```bash
 python -c "from app.sdk.client import RagEval; print('OK')"
 ```
 Expected output: `OK`
+
+> **If you get `ModuleNotFoundError`** — check your prompt shows `(rag_agentic)`. If it shows `(base)`, run `conda activate rag_agentic` first.
 
 ### Step 3 — Create your `.env` file
 
