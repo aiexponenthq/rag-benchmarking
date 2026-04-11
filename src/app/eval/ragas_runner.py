@@ -114,22 +114,25 @@ def run_evaluation(
     from langchain_google_genai import ChatGoogleGenerativeAI
     from ragas.llms import LangchainLLMWrapper
 
-    # Use app settings (reads from .env via pydantic-settings) then fall back
-    # to os.getenv for environments where the var is already exported
-    from app.config.settings import get_settings
-    gemini_api_key = get_settings().gemini_api_key or os.getenv("GEMINI_API_KEY")
-    if not gemini_api_key:
-        raise RuntimeError("GEMINI_API_KEY is required to run RAGAS with Gemini judge")
-
     from app.config.settings import get_settings as _get_settings
-    _gemini_model = _get_settings().gemini_model or "gemini-2.0-flash"
+    _settings = _get_settings()
+
+    gemini_api_key = _settings.gemini_api_key or os.getenv("GEMINI_API_KEY")
+    if not gemini_api_key:
+        raise RuntimeError(
+            "GEMINI_API_KEY is required. Set it in your .env file."
+        )
+
+    _gemini_model = _settings.gemini_model or "gemini-2.0-flash"
+
+    # langchain-google-genai 4.x reads the key from GOOGLE_API_KEY env var only
+    # (the google_api_key constructor parameter was removed in 4.x)
+    os.environ["GOOGLE_API_KEY"] = gemini_api_key
 
     langchain_llm = ChatGoogleGenerativeAI(
         model=_gemini_model,
-        google_api_key=gemini_api_key,
         temperature=0.0,
     )
-    # ragas 0.4.x requires a wrapped LangchainLLMWrapper, not a raw LangChain LLM
     ragas_llm = LangchainLLMWrapper(langchain_llm)
 
     # ------------------------------------------------------------------ #
