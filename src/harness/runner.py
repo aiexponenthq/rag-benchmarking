@@ -93,7 +93,7 @@ class EvaluationRunner:
                     skipped.append(m)
                     skip_reasons[m] = result.get("skip_reason") or "skipped by RAGAS runner"
 
-        # --- Other metrics (stubs until Phase 2/3 tasks implement them) ---
+        # --- Retrieval metrics and agentic metrics ---
         for m in other_metrics:
             if m == "source_attribution_accuracy":
                 from app.eval.agentic_metrics import source_attribution_accuracy
