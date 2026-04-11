@@ -113,7 +113,10 @@ def run_evaluation(
     from langchain_google_genai import ChatGoogleGenerativeAI
     from ragas.llms import LangchainLLMWrapper
 
-    gemini_api_key = os.getenv("GEMINI_API_KEY")
+    # Use app settings (reads from .env via pydantic-settings) then fall back
+    # to os.getenv for environments where the var is already exported
+    from app.config.settings import get_settings
+    gemini_api_key = get_settings().gemini_api_key or os.getenv("GEMINI_API_KEY")
     if not gemini_api_key:
         raise RuntimeError("GEMINI_API_KEY is required to run RAGAS with Gemini judge")
 
