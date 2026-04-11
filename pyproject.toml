@@ -39,7 +39,7 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["app*"]
+include = ["app*", "harness*"]
 exclude = []
 
 [tool.black]
