@@ -134,10 +134,21 @@ def run_evaluation(
     ragas_llm = LangchainLLMWrapper(langchain_llm)
 
     # Inject the LLM into every metric object explicitly.
-    # Without this, some metrics (context_precision, context_recall) default
-    # to OpenAI even when a different LLM is passed to evaluate().
+    # Without this, metrics default to OpenAI even when a different LLM
+    # is passed to evaluate().
     for metric in metric_objs:
         metric.llm = ragas_llm
+
+    # AnswerRelevancy also needs embeddings — inject HuggingFace (sentence-transformers)
+    # so it never falls back to OpenAI embeddings.
+    from langchain_community.embeddings import HuggingFaceEmbeddings
+    from ragas.embeddings import LangchainEmbeddingsWrapper
+    _hf_embeddings = LangchainEmbeddingsWrapper(
+        HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    )
+    for metric in metric_objs:
+        if hasattr(metric, "embeddings"):
+            metric.embeddings = _hf_embeddings
 
     # ------------------------------------------------------------------ #
     # Run evaluation                                                       #
