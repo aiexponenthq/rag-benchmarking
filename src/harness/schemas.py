@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
@@ -89,7 +89,7 @@ class EvalResult(BaseModel):
 
 class BenchmarkReport(BaseModel):
     run_id: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     n_samples: int
     metrics: dict[str, float]
     per_sample: list[EvalResult] = Field(default_factory=list)

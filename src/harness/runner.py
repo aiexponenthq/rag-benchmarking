@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 
 from harness.schemas import (
     BenchmarkReport,
@@ -144,7 +144,7 @@ class EvaluationRunner:
 
         return BenchmarkReport(
             run_id=run_id,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
             n_samples=len(samples),
             metrics=aggregate,
             per_sample=per_sample_results,
