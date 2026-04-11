@@ -249,7 +249,7 @@ class MyRAG:
 
 ## Configuration
 
-Copy `.env.local.example` to `.env` and set:
+Copy `.env.example` to `.env` and set:
 
 ```bash
 # LLM provider for faithfulness judge

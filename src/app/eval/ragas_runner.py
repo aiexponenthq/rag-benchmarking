@@ -112,7 +112,6 @@ def run_evaluation(
     from langchain_google_genai import ChatGoogleGenerativeAI
     from ragas.llms import LangchainLLMWrapper
 
-    from app.config.settings import get_settings as _get_settings
     _settings = _get_settings()
 
     gemini_api_key = _settings.gemini_api_key or os.getenv("GEMINI_API_KEY")

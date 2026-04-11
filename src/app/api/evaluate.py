@@ -8,7 +8,6 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-import app.eval.ragas_runner as rr
 from app.api.security import get_api_key
 from app.eval.reporting import write_report_files
 from app.eval.result_store import ResultStore

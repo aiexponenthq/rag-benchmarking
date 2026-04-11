@@ -6,7 +6,7 @@
 - Each sample has: `question`, `contexts`, `answer`, `ground_truths`, `relevant_doc_ids`, `sample_id`
 - See `data/golden/qa.jsonl`
 
-> **Note:** Scores below are representative baselines computed using Gemini 1.5 Flash as judge at `temperature=0.0`. Your scores will vary based on your LLM provider, judge model, and RAG system configuration. These figures are provided as illustrative reference points, not guarantees.
+> **Note:** Scores below were measured on the 50-sample golden dataset using `gemini-2.5-flash` as judge at `temperature=0.0`, with `all-MiniLM-L6-v2` embeddings for `answer_relevancy`. Your scores will vary based on your LLM provider, judge model, and RAG system configuration.
 
 ---
 
@@ -16,8 +16,8 @@ Metric group: `classic` — LLM-as-judge metrics requiring `question`, `contexts
 
 | Metric | Score | Interpretation |
 |---|---|---|
-| `faithfulness` | 0.89 | High — most answers fully grounded in context |
-| `answer_relevancy` | 0.91 | High — answers address the questions directly |
+| `faithfulness` | 0.958 | Excellent — 95.8% of claims fully grounded in context |
+| `answer_relevancy` | 0.810 | Good — answers address the questions well |
 
 ---
 
