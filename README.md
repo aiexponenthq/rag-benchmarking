@@ -165,22 +165,27 @@ comparison = client.compare_runs(["run-a", "run-b"])
 
 ## Architecture
 
-```
-Your RAG System (LangChain / LlamaIndex / custom)
-        │
-        ▼  RagEval.from_langchain() or from_llamaindex()
-        │
-        ▼  EvalSample / AgentTrace  (harness/schemas.py)
-        │
-        ▼  EvaluationRunner  (harness/runner.py)
-        │
-        ├─▶ RAGAS metrics      (faithfulness, answer_relevancy, context_precision/recall)
-        ├─▶ Retrieval metrics  (Precision@K, Recall@K, MRR, NDCG)
-        └─▶ Agentic metrics    (source attribution, agent faithfulness, tool accuracy)
-        │
-        ▼  BenchmarkReport → SQLite ResultStore
-        │
-        ▼  /v1/runs  (compare across runs over time)
+```mermaid
+flowchart TD
+    A["Your RAG System\n(LangChain / LlamaIndex / Custom)"]
+    B["SDK Adapters\nRagEval.from_langchain()\nRagEval.from_llamaindex()"]
+    C["EvalSample / AgentTrace\nharness/schemas.py"]
+    D["EvaluationRunner\nharness/runner.py"]
+    E["RAGAS Metrics\nfaithfulness · answer_relevancy\ncontext_precision · context_recall"]
+    F["Retrieval Metrics\nPrecision@K · Recall@K · MRR · NDCG"]
+    G["Agentic Metrics\nagent_faithfulness · tool_call_accuracy\nretrieval_necessity · source_attribution"]
+    H["BenchmarkReport"]
+    I["SQLite ResultStore\nharness/result_store.py"]
+    J["REST API\n/v1/evaluate · /v1/evaluate/agent\n/v1/runs · /v1/runs/compare"]
+
+    A --> B --> C --> D
+    D --> E
+    D --> F
+    D --> G
+    E --> H
+    F --> H
+    G --> H
+    H --> I --> J
 ```
 
 ### Plug-in contract
