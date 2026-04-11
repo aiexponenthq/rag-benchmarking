@@ -96,9 +96,15 @@ class EvaluationRunner:
         # --- Other metrics (stubs until Phase 2/3 tasks implement them) ---
         for m in other_metrics:
             if m == "source_attribution_accuracy":
-                # Stub: will be replaced in Task 3.1
-                aggregate[m] = 1.0
-                per_sample_scores[m] = [1.0] * len(samples)
+                from app.eval.agentic_metrics import source_attribution_accuracy
+                import re
+                scores = []
+                for s in samples:
+                    cited = re.findall(r'\[source:\s*([^\]]+)\]', s.answer)
+                    result = source_attribution_accuracy(cited, s.retrieved_doc_ids)
+                    scores.append(result["score"])
+                aggregate[m] = sum(scores) / len(scores) if scores else 1.0
+                per_sample_scores[m] = scores
             elif m in _RELEVANT_IDS_REQUIRED:
                 from app.eval.retrieval_metrics import (
                     precision_at_k, recall_at_k, mean_reciprocal_rank, ndcg_at_k
