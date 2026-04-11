@@ -47,3 +47,5 @@ data/processed/
 reports/
 
 
+*.db
+data/benchmark_results.db
