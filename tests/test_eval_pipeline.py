@@ -316,7 +316,8 @@ class TestEvaluateEndpoint:
         api_client: TestClient,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        import app.eval.ragas_runner as rr
+        # Patch run_evaluation where EvaluationRunner imports it
+        import harness.runner as runner_mod
 
         def fake_run(samples: Any, metrics: Any = None) -> dict[str, Any]:
             return {
@@ -326,7 +327,7 @@ class TestEvaluateEndpoint:
                 "skip_reason": None,
             }
 
-        monkeypatch.setattr(rr, "run_evaluation", fake_run)
+        monkeypatch.setattr(runner_mod, "run_evaluation", fake_run)
 
         payload = {
             "samples": [
@@ -341,7 +342,8 @@ class TestEvaluateEndpoint:
         resp = api_client.post("/v1/evaluate", json=payload)
         assert resp.status_code == 200
         data = resp.json()
-        assert data["result"]["metrics"]["faithfulness"] == pytest.approx(0.91)
+        # New response shape: metrics at top level (not nested under "result")
+        assert data["metrics"]["faithfulness"] == pytest.approx(0.91)
         assert "written" in data
 
     def test_evaluate_multiple_samples(
@@ -350,12 +352,12 @@ class TestEvaluateEndpoint:
         monkeypatch: pytest.MonkeyPatch,
         golden_samples: list[dict[str, Any]],
     ) -> None:
-        import app.eval.ragas_runner as rr
+        import harness.runner as runner_mod
 
         received: list[Any] = []
 
         def fake_run(samples: Any, metrics: Any = None) -> dict[str, Any]:
-            received.append(samples)
+            received.extend(samples)
             return {
                 "metrics": {"faithfulness": 0.9, "answer_relevancy": 0.85},
                 "per_sample": {},
@@ -363,7 +365,7 @@ class TestEvaluateEndpoint:
                 "skip_reason": None,
             }
 
-        monkeypatch.setattr(rr, "run_evaluation", fake_run)
+        monkeypatch.setattr(runner_mod, "run_evaluation", fake_run)
 
         payload = {
             "samples": [
@@ -378,19 +380,19 @@ class TestEvaluateEndpoint:
         }
         resp = api_client.post("/v1/evaluate", json=payload)
         assert resp.status_code == 200
-        assert len(received[0]) == 5
+        assert len(received) == 5
 
     def test_evaluate_propagates_500_on_error(
         self,
         api_client: TestClient,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        import app.eval.ragas_runner as rr
+        import harness.runner as runner_mod
 
         def boom(samples: Any, metrics: Any = None) -> dict[str, Any]:
             raise RuntimeError("GEMINI_API_KEY is required")
 
-        monkeypatch.setattr(rr, "run_evaluation", boom)
+        monkeypatch.setattr(runner_mod, "run_evaluation", boom)
 
         payload = {
             "samples": [
