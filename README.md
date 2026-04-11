@@ -61,6 +61,34 @@ docker compose up
 uvicorn app.main:app --port 5001
 ```
 
+### Interactive API docs
+
+Once the server is running, the full OpenAPI reference is available at:
+
+```
+http://localhost:5001/docs
+```
+
+---
+
+## LLM Backend for Evaluation
+
+Several metrics (faithfulness, context_precision, context_recall, agent_faithfulness, tool_call_accuracy, retrieval_necessity) use an LLM as a judge. The harness supports **Gemini** (recommended) and **OpenAI**.
+
+```bash
+# Set in .env:
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=your-gemini-key
+
+# Or OpenAI:
+LLM_PROVIDER=openai
+OPENAI_API_KEY=your-openai-key
+```
+
+**Determinism:** Judge calls run at `temperature=0.0` to minimise variance across evaluation runs. For CI/CD integration, run evaluations at least twice and flag changes beyond a ±0.05 threshold rather than asserting exact scores.
+
+**Cost guidance:** A full evaluation pass (all classic metrics) on 50 samples costs approximately $0.05–$0.15 with Gemini Flash or GPT-4o-mini. Source attribution accuracy is deterministic and costs nothing.
+
 ---
 
 ## Metrics
@@ -91,10 +119,17 @@ For multi-step agents, tool-using systems, and autonomous RAG pipelines:
 
 ### Metric Groups
 
+| Group | Metrics included |
+|---|---|
+| `classic` | faithfulness, answer_relevancy |
+| `retrieval` | precision_at_k, recall_at_k, mrr, ndcg_at_k |
+| `agentic_v1` | source_attribution_accuracy, retrieval_necessity, agent_faithfulness, tool_call_accuracy |
+| `agentic_v2` | multihop_faithfulness, agent_trajectory_efficiency, reasoning_hallucination, context_coherence_across_turns |
+| `full` | all classic + retrieval + agentic_v1 metrics |
+
 ```python
 # Use a pre-defined group instead of listing metrics individually
 report = client.evaluate(samples, metric_group="classic")
-# Groups: classic | retrieval | agentic_v1 | agentic_v2 | full
 ```
 
 ---
@@ -270,6 +305,27 @@ Maps to **Article 15** — Accuracy, Robustness and Cybersecurity for High-Risk 
 - Accuracy metrics only — latency and throughput are not measured.
 - LLM-as-judge metrics depend on the quality of the configured judge model.
 - Rate limiting is in-memory and resets on server restart.
+
+---
+
+## Version Compatibility
+
+| Dependency | Tested version |
+|---|---|
+| Python | 3.11, 3.12 |
+| RAGAS | 0.4.x |
+| LangChain | ≥ 0.1 |
+| LlamaIndex | ≥ 0.10 |
+| FastAPI | ≥ 0.110 |
+
+---
+
+## Further Reading
+
+- [DEPLOYMENT.md](DEPLOYMENT.md) — Docker, Kubernetes, security configuration
+- [CONTRIBUTING.md](CONTRIBUTING.md) — how to contribute, commit conventions, test guidelines
+- [SECURITY.md](SECURITY.md) — vulnerability reporting policy
+- [CHANGELOG.md](CHANGELOG.md) — version history
 
 ---
 
