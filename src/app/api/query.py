@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import asyncio
+import functools
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
@@ -27,19 +31,42 @@ def get_rag_engine() -> RAGEngine:
 
 
 @router.post("/query", response_model=QueryResponse)
-def post_query(req: QueryRequest, engine: RAGEngine = Depends(get_rag_engine)) -> QueryResponse:
+async def post_query(
+    req: QueryRequest, engine: RAGEngine = Depends(get_rag_engine)
+) -> QueryResponse:
+    """Async query endpoint.
+
+    ``RAGEngine.query()`` calls sentence-transformers (CPU-bound / sync) and
+    blocking HTTP calls to OpenAI / Gemini.  We run it in a thread-pool
+    executor so the FastAPI event loop is never blocked.
+
+    Pattern for sync code in async FastAPI:
+        loop = asyncio.get_running_loop()
+        result = await loop.run_in_executor(None, functools.partial(sync_fn, *args))
+    """
+    loop = asyncio.get_running_loop()
     try:
-        result = engine.query(req.query, req.top_k, req.rerank)
+        result = await loop.run_in_executor(
+            None,
+            functools.partial(engine.query, req.query, req.top_k, req.rerank),
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
 
-    # Token usage is provider-specific; placeholder zeros for now
-    tokens = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+    # Token usage: LLMClient.generate() stores self._last_token_usage after
+    # each call.  Guard against mock engines (test environments) where the
+    # attribute may be a Mock object rather than a dict.
+    _raw = getattr(getattr(engine, "llm", None), "_last_token_usage", None)
+    last_usage: dict[str, int] = (
+        _raw
+        if isinstance(_raw, dict)
+        else {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+    )
 
     return QueryResponse(
         answer=result.answer,
         citations=result.citations,
         timings_ms=result.timings,
-        tokens=tokens,
+        tokens=last_usage,
         groundedness=result.groundedness,
     )
