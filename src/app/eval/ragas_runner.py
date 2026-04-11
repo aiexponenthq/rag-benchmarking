@@ -123,7 +123,7 @@ def run_evaluation(
             "GEMINI_API_KEY is required. Set it in your .env file."
         )
 
-    _gemini_model = _settings.gemini_model or "gemini-2.0-flash"
+    _gemini_model = _settings.gemini_model or "gemini-2.5-flash"
 
     # langchain-google-genai 4.x reads the key from GOOGLE_API_KEY env var only
     # (the google_api_key constructor parameter was removed in 4.x)
