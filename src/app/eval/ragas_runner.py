@@ -71,14 +71,12 @@ def run_evaluation(
             continue
         selected.append(m)
 
+    # Build metric objects — LLM is injected AFTER ragas_llm is created below.
+    # Store as dict so we can set the llm on each object once it's ready.
     name_to_metric: dict[str, Any] = {
         "faithfulness": Faithfulness(),
         "answer_relevancy": AnswerRelevancy(),
-        # RAGAS 0.4.x: LLMContextPrecisionWithReference requires
-        # SingleTurnSample fields: user_input, retrieved_contexts, reference
         "context_precision": LLMContextPrecisionWithReference(),
-        # RAGAS 0.4.x: LLMContextRecall requires
-        # SingleTurnSample fields: user_input, retrieved_contexts, reference
         "context_recall": LLMContextRecall(),
     }
 
@@ -134,6 +132,12 @@ def run_evaluation(
         temperature=0.0,
     )
     ragas_llm = LangchainLLMWrapper(langchain_llm)
+
+    # Inject the LLM into every metric object explicitly.
+    # Without this, some metrics (context_precision, context_recall) default
+    # to OpenAI even when a different LLM is passed to evaluate().
+    for metric in metric_objs:
+        metric.llm = ragas_llm
 
     # ------------------------------------------------------------------ #
     # Run evaluation                                                       #
