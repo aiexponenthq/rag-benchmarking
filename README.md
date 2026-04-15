@@ -1,10 +1,19 @@
-# RAG Benchmarking
+<p align="center">
+  <a href="https://aiexponent.com"><img src=".github/brand/logo-full-light.png" alt="AiExponent — Building AI that deserves to be trusted" width="560"></a>
+</p>
 
-[![PyPI](https://img.shields.io/pypi/v/rag-benchmarking.svg)](https://pypi.org/project/rag-benchmarking/)
-[![CI](https://github.com/aiexponenthq/rag-benchmarking/actions/workflows/ci.yml/badge.svg)](https://github.com/aiexponenthq/rag-benchmarking/actions)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
-[![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Article%2015-gold.svg)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689)
+<h1 align="center">RAG Benchmarking</h1>
+<p align="center"><em>Prove your RAG system works — before you ship.</em></p>
+
+<p align="center">
+  <a href="https://pypi.org/project/rag-benchmarking/"><img src="https://img.shields.io/pypi/v/rag-benchmarking.svg" alt="PyPI"></a>
+  <a href="https://github.com/aiexponenthq/rag-benchmarking/actions"><img src="https://github.com/aiexponenthq/rag-benchmarking/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-0D5463.svg" alt="License: Apache 2.0"></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.11%2B-0D5463.svg" alt="Python 3.11+"></a>
+  <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689"><img src="https://img.shields.io/badge/EU%20AI%20Act-Article%2015-0D5463.svg" alt="EU AI Act Article 15"></a>
+</p>
+
+---
 
 **A framework-agnostic evaluation harness for RAG and agentic AI systems.**
 
