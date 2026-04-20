@@ -49,3 +49,7 @@ reports/
 
 *.db
 data/benchmark_results.db
+
+# Personal AI assistant instructions (never commit)
+CLAUDE.md
+.claude/
