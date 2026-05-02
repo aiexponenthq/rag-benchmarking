@@ -253,6 +253,8 @@ graph LR
 
 Systematic RAG evaluation produces audit-ready evidence for Article 15's accuracy and robustness requirements.
 
+> **Scope note — cybersecurity is out of scope.** Article 15 covers three concerns: **accuracy, robustness, and cybersecurity**. `rag-benchmarking` covers the first two. For the cybersecurity leg of Article 15 (adversarial prompt injection, jailbreak resistance, model integrity), pair this tool with a runtime AI security control such as AgentShield. Penalty band for Art. 15 violations: up to **€15M or 3% of global annual turnover** under [Art. 99(4)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689).
+
 ---
 
 ## AiExponent Toolchain
