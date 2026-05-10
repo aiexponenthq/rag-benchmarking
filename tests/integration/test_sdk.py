@@ -16,12 +16,12 @@ def test_sdk_evaluate_list_of_dicts():
     with patch("app.sdk.client.requests.post") as mock_post:
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
-            "scores": {"faithfulness": 0.9},
+            "metrics": {"faithfulness": 0.9},
             "run_id": "run-001",
         }
         mock_post.return_value.raise_for_status = MagicMock()
         report = client.evaluate(samples, metrics=["faithfulness"])
-    assert report["scores"]["faithfulness"] == 0.9
+    assert report["metrics"]["faithfulness"] == 0.9
 
 
 def test_sdk_from_langchain_style():

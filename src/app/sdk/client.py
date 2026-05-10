@@ -13,7 +13,7 @@ class RagEval:
 
         client = RagEval(api_url="http://localhost:5001", api_key="your-key")
         report = client.evaluate(samples, metrics=["faithfulness", "answer_relevancy"])
-        print(report["scores"])
+        print(report["metrics"])
 
     LangChain integration::
 
@@ -57,9 +57,13 @@ class RagEval:
           - "answer": str
 
         Optional fields:
-          - "ground_truth": str  (enables context_precision, context_recall)
+          - "ground_truths": list[str]  (Ragas convention; enables context_precision, context_recall)
           - "retrieved_doc_ids": list[str]  (enables Precision@K, Recall@K)
           - "relevant_doc_ids": list[str]
+
+        Backward compatibility: the legacy singular ``"ground_truth": str`` key is
+        also accepted and promoted to a single-element ``ground_truths`` list at
+        construction time. Prefer the plural form for new code.
         """
         payload: dict[str, Any] = {"samples": samples}
         if metrics:

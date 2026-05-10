@@ -49,7 +49,10 @@ class LLMClient:
         settings = get_settings()
         self.provider = (settings.llm_provider or "").lower()
         self.openai_model = settings.openai_model or "gpt-4o-mini"
-        self.gemini_model = settings.gemini_model or "gemini-1.5-flash"
+        # Built-in RAG pipeline default. Aligned with the eval-harness judge
+        # default (RunConfig.judge_model) which moved 1.5 → 2.5 at v1.0.0
+        # (audit RB-H2). Override via the GEMINI_MODEL env var.
+        self.gemini_model = settings.gemini_model or "gemini-2.5-flash"
         self.temperature = settings.llm_temperature
         self.max_tokens = settings.llm_max_tokens
         self.openai_api_key = settings.openai_api_key
