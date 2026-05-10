@@ -2,13 +2,13 @@ import json
 from unittest.mock import MagicMock, patch
 
 import pytest
-from harness.schemas import AgentTrace, ReasoningStep, RetrievedChunk, ToolCall
 
 from app.eval.agentic_llm_metrics import (
     compute_agent_faithfulness,
     compute_retrieval_necessity,
     compute_tool_call_accuracy,
 )
+from harness.schemas import AgentTrace, ReasoningStep, RetrievedChunk, ToolCall
 
 
 def make_trace():

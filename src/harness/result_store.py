@@ -70,7 +70,7 @@ class ResultStore:
         with sqlite3.connect(self._db_path) as conn:
             conn.row_factory = sqlite3.Row
             rows = conn.execute(
-                "SELECT run_id, created_at, n_samples, metrics " "FROM benchmark_runs ORDER BY created_at DESC LIMIT ?",
+                "SELECT run_id, created_at, n_samples, metrics FROM benchmark_runs ORDER BY created_at DESC LIMIT ?",
                 (limit,),
             ).fetchall()
         return [

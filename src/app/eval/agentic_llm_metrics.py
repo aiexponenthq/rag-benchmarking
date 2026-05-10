@@ -4,9 +4,8 @@ import json
 import logging
 from typing import Any
 
-from harness.schemas import AgentTrace
-
 from app.llm.client import LLMClient
+from harness.schemas import AgentTrace
 
 logger = logging.getLogger(__name__)
 

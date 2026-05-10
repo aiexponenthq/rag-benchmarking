@@ -26,7 +26,7 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install -e ".[test]" ruff mypy
+        run: pip install -e ".[test,lint]"
 
       - name: Lint (ruff check)
         run: python -m ruff check src tests

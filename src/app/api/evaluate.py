@@ -6,12 +6,12 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
-from harness.schemas import AgentTrace
 from pydantic import BaseModel, Field
 
 from app.api.security import get_api_key
 from app.eval.reporting import write_report_files
 from app.eval.result_store import ResultStore
+from harness.schemas import AgentTrace
 
 router = APIRouter(prefix="/v1", tags=["evaluate"])
 

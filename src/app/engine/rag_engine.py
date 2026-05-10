@@ -125,7 +125,7 @@ class RAGEngine:
         return RAGResult(answer=answer, citations=citations, timings=timings, groundedness=groundedness)
 
     def _call_llm(self, query: str, chunks: list[dict[str, Any]]) -> str:
-        context_blocks = "\n\n".join([f"[source: {c.get('source_id','')}]\n{c.get('text','')}" for c in chunks])
+        context_blocks = "\n\n".join([f"[source: {c.get('source_id', '')}]\n{c.get('text', '')}" for c in chunks])
         user_prompt = self.settings.user_prompt_template.format(context_blocks=context_blocks, query=query)
         return self.llm.generate(self.settings.system_prompt, user_prompt)
 

@@ -51,6 +51,15 @@ test = [
   "pytest-cov>=5.0",
   "httpx>=0.27",
 ]
+# Lint/type tools pinned so CI lint runs are deterministic across the
+# release window. New ruff rules (UP042, stricter I001 import-sort) shipped
+# while this PR was open and surfaced as CI red on a tree that was clean
+# under the prior version. Pinning here means a deliberate version bump
+# is needed to flip new rules on, which is the right authoring loop.
+lint = [
+  "ruff==0.15.12",
+  "mypy>=1.10",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

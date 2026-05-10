@@ -1,6 +1,8 @@
 import uuid
 
 import pytest
+from pydantic import ValidationError
+
 from harness.schemas import (
     AgentTrace,
     BenchmarkReport,
@@ -8,7 +10,6 @@ from harness.schemas import (
     RunConfig,
     ToolCall,
 )
-from pydantic import ValidationError
 
 
 def test_eval_sample_minimal():

@@ -136,7 +136,7 @@ class ResultStore:
 
         with self._conn() as conn:
             conn.execute(
-                "INSERT INTO runs (run_id, created_at, metrics, n_samples, skipped) " "VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO runs (run_id, created_at, metrics, n_samples, skipped) VALUES (?, ?, ?, ?, ?)",
                 (
                     run_id,
                     now,
@@ -183,7 +183,7 @@ class ResultStore:
         """Return summary rows for recent runs, newest first."""
         with self._conn() as conn:
             rows = conn.execute(
-                "SELECT run_id, created_at, metrics, n_samples, skipped " "FROM runs ORDER BY id DESC LIMIT ?",
+                "SELECT run_id, created_at, metrics, n_samples, skipped FROM runs ORDER BY id DESC LIMIT ?",
                 (limit,),
             ).fetchall()
         return [

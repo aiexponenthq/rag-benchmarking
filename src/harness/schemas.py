@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import uuid
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
 
-class MetricGroup(str, Enum):
+class MetricGroup(StrEnum):
     CLASSIC = "classic"
     RETRIEVAL = "retrieval"
     AGENTIC_V1 = "agentic_v1"
@@ -16,7 +16,7 @@ class MetricGroup(str, Enum):
     FULL = "full"
 
 
-class ToolCallType(str, Enum):
+class ToolCallType(StrEnum):
     RETRIEVE = "retrieve"
     WEB_SEARCH = "web_search"
     CODE_EXEC = "code_exec"
