@@ -1,5 +1,3 @@
-import os
-
 import pytest
 from fastapi.testclient import TestClient
 
@@ -12,6 +10,7 @@ def _set_e2e_env(monkeypatch_module):
     monkeypatch_module.setenv("LLM_PROVIDER", "echo")
     # Clear settings cache so the patched env is picked up
     from app.config.settings import get_settings
+
     get_settings.cache_clear()
     yield
     get_settings.cache_clear()
@@ -21,6 +20,7 @@ def _set_e2e_env(monkeypatch_module):
 def monkeypatch_module(request):
     """Module-scoped monkeypatch fixture."""
     from _pytest.monkeypatch import MonkeyPatch
+
     mp = MonkeyPatch()
     yield mp
     mp.undo()
@@ -29,6 +29,7 @@ def monkeypatch_module(request):
 @pytest.fixture(scope="module")
 def client(_set_e2e_env):
     from app.main import app
+
     return TestClient(app)
 
 

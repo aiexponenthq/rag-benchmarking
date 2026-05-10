@@ -36,9 +36,9 @@ We credit reporters in release notes unless they prefer to remain anonymous.
 
 This tool processes RAG evaluation data locally. When using the server:
 
-- Evaluation samples and results are stored in a local SQLite database (`data/benchmark_results.db`)
-- LLM judge calls are made to your configured provider (Gemini or OpenAI) — review their privacy policies
-- No data is sent to AiExponent servers
+- Evaluation samples and results are stored in a local SQLite database (`eval_results.db` at the project root by default; gitignored). The database is created on first run and never sent off-host by the harness itself.
+- LLM judge calls are made to your configured provider (Gemini or OpenAI) — review their privacy policies.
+- No data is sent to AI Exponent LLC servers.
 
 ## Contact
 

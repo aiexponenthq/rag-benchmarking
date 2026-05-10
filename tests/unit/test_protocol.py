@@ -1,9 +1,11 @@
 import pytest
+
 from harness.protocol import RAGEvaluable, validate_evaluable
 
 
 class MockRAG:
     """Minimal compliant implementation."""
+
     def run(self, question: str, contexts_override: list[str] | None = None) -> dict:
         return {
             "answer": f"Answer to: {question}",
@@ -14,6 +16,7 @@ class MockRAG:
 
 class LangChainRAG:
     """Simulate a LangChain chain — doesn't implement protocol directly."""
+
     def invoke(self, inputs: dict) -> dict:
         return {"result": "answer", "source_documents": []}
 

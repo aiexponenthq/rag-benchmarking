@@ -21,16 +21,29 @@ Metric group: `classic` — LLM-as-judge metrics requiring `question`, `contexts
 
 ---
 
-## Retrieval Metrics — Baseline Scores
+## Retrieval Metrics — indicative, retriever-dependent
 
-Metric group: `retrieval` — deterministic metrics using `relevant_doc_ids`. K=5.
+The retrieval metrics (`precision_at_k`, `recall_at_k`, `mrr`, `ndcg_at_k`) are
+fully deterministic given the inputs, **but the score depends on which retriever
+configuration you run** — embedding model, top-K, corpus index. There is no
+single "RAG Benchmarking baseline" for these metrics: a stronger retriever
+will pull every score higher; a weaker one will pull every score lower.
 
-| Metric | Score | Interpretation |
-|---|---|---|
-| `precision_at_k` | 0.72 | Moderate — 3–4 of top-5 retrieved docs are relevant |
-| `recall_at_k` | 0.81 | Good — most relevant docs found in top-5 |
-| `mrr` | 0.78 | Good — first relevant doc usually in top-2 positions |
-| `ndcg_at_k` | 0.76 | Good — relevant docs concentrated near top |
+Earlier versions of this doc shipped a sample table (precision_at_k 0.72,
+recall_at_k 0.81, mrr 0.78, ndcg_at_k 0.76) without naming the retriever
+configuration. Audit RB-H3 (2026-05-10) flagged that as unreproducible, so
+the table is removed. To get retrieval-metric numbers for your system, run:
+
+```bash
+python scripts/evaluate.py data/golden/qa.jsonl \
+  --metrics precision_at_k recall_at_k mrr ndcg_at_k \
+  --k 5 \
+  --out reports/retrieval_report.json
+```
+
+Both `data/golden/qa.jsonl` (50 samples with `relevant_doc_ids`) and the
+exact retriever you wire in are part of the input — pin them in your run
+record so subsequent runs are comparable.
 
 ---
 
@@ -92,7 +105,7 @@ The default output path is `reports/ragas_report.json` with a matching `reports/
 
 ## Reproducibility Notes
 
-- Judge model: Gemini 1.5 Flash (`gemini-1.5-flash`)
+- Judge model: Gemini 2.5 Flash (`gemini-2.5-flash`). Pinned as the default in `RunConfig.judge_model`. The headline 0.958 / 0.810 figures were re-validated against `gemini-2.5-flash` after `gemini-1.5-flash` was deprecated upstream. Cross-judge absolute comparisons remain unreliable — pin the same judge across runs you compare.
 - Judge temperature: `0.0`
 - K for retrieval metrics: `5`
 - Dataset: `data/golden/qa.jsonl` (50 samples, SHA recorded in `reports/`)

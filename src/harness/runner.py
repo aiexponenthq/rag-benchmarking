@@ -5,10 +5,10 @@ import uuid
 from datetime import UTC, datetime
 
 from harness.schemas import (
+    METRIC_GROUPS,
     BenchmarkReport,
     EvalResult,
     EvalSample,
-    METRIC_GROUPS,
     RunConfig,
 )
 
@@ -53,7 +53,7 @@ class EvaluationRunner:
         skip_reasons: dict[str, str] = {}
 
         # Pre-flight: determine what can actually be computed
-        has_ground_truths = all(s.ground_truth for s in samples)
+        has_ground_truths = all(s.ground_truths for s in samples)
         has_relevant_ids = all(s.relevant_doc_ids for s in samples)
 
         active: list[str] = []
@@ -81,7 +81,7 @@ class EvaluationRunner:
                     "question": s.question,
                     "contexts": s.contexts,
                     "answer": s.answer,
-                    "ground_truths": [s.ground_truth] if s.ground_truth else [],
+                    "ground_truths": s.ground_truths,
                 }
                 for s in samples
             ]
@@ -96,19 +96,25 @@ class EvaluationRunner:
         # --- Retrieval metrics and agentic metrics ---
         for m in other_metrics:
             if m == "source_attribution_accuracy":
-                from app.eval.agentic_metrics import source_attribution_accuracy
                 import re
+
+                from app.eval.agentic_metrics import source_attribution_accuracy
+
                 scores = []
                 for s in samples:
-                    cited = re.findall(r'\[source:\s*([^\]]+)\]', s.answer)
+                    cited = re.findall(r"\[source:\s*([^\]]+)\]", s.answer)
                     result = source_attribution_accuracy(cited, s.retrieved_doc_ids)
                     scores.append(result["score"])
                 aggregate[m] = sum(scores) / len(scores) if scores else 1.0
                 per_sample_scores[m] = scores
             elif m in _RELEVANT_IDS_REQUIRED:
                 from app.eval.retrieval_metrics import (
-                    precision_at_k, recall_at_k, mean_reciprocal_rank, ndcg_at_k
+                    mean_reciprocal_rank,
+                    ndcg_at_k,
+                    precision_at_k,
+                    recall_at_k,
                 )
+
                 k = self.config.k
                 scores = []
                 for s in samples:

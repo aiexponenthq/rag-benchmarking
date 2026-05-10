@@ -1,5 +1,5 @@
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from app.sdk.client import RagEval
 
 
@@ -26,6 +26,7 @@ def test_sdk_evaluate_list_of_dicts():
 
 def test_sdk_from_langchain_style():
     """SDK from_langchain adapter converts chain output to EvalSample dict."""
+
     class FakeDoc:
         page_content = "RAG is Retrieval-Augmented Generation."
         metadata = {"id": "doc-1"}
@@ -44,6 +45,7 @@ def test_sdk_from_langchain_style():
 
 def test_sdk_from_llamaindex_style():
     """SDK from_llamaindex adapter converts query engine response."""
+
     class FakeNode:
         text = "RAG stands for Retrieval-Augmented Generation."
         node_id = "node-abc"
@@ -53,6 +55,7 @@ def test_sdk_from_llamaindex_style():
 
     class FakeResponse:
         source_nodes = [FakeNode()]
+
         def __str__(self):
             return "RAG is Retrieval-Augmented Generation."
 

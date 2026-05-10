@@ -53,15 +53,10 @@ def run_evaluation(
     # ------------------------------------------------------------------ #
     # Determine which metrics to run                                       #
     # ------------------------------------------------------------------ #
-    all_requested = list(
-        metrics
-        or ["faithfulness", "answer_relevancy", "context_precision", "context_recall"]
-    )
+    all_requested = list(metrics or ["faithfulness", "answer_relevancy", "context_precision", "context_recall"])
 
     # Retrieval metrics need ground truth — inspect first sample to decide
-    has_ground_truth = any(
-        bool(s.get("ground_truths") or s.get("reference")) for s in samples
-    )
+    has_ground_truth = any(bool(s.get("ground_truths") or s.get("reference")) for s in samples)
 
     RETRIEVAL_METRICS = {"context_precision", "context_recall"}
     selected: list[str] = []
@@ -91,9 +86,7 @@ def run_evaluation(
     ragas_samples: list[SingleTurnSample] = []
     for s in samples:
         ground_truth_list: list[str] = s.get("ground_truths") or []
-        reference: str | None = s.get("reference") or (
-            ground_truth_list[0] if ground_truth_list else None
-        )
+        reference: str | None = s.get("reference") or (ground_truth_list[0] if ground_truth_list else None)
         ragas_samples.append(
             SingleTurnSample(
                 user_input=s.get("user_input") or s.get("question", ""),
@@ -108,17 +101,16 @@ def run_evaluation(
     # ------------------------------------------------------------------ #
     # Configure judge LLM (LangChain wrapper for RAGAS 0.4.x)             #
     # ------------------------------------------------------------------ #
-    from app.config.settings import get_settings as _get_settings
     from langchain_google_genai import ChatGoogleGenerativeAI
     from ragas.llms import LangchainLLMWrapper
+
+    from app.config.settings import get_settings as _get_settings
 
     _settings = _get_settings()
 
     gemini_api_key = _settings.gemini_api_key or os.getenv("GEMINI_API_KEY")
     if not gemini_api_key:
-        raise RuntimeError(
-            "GEMINI_API_KEY is required. Set it in your .env file."
-        )
+        raise RuntimeError("GEMINI_API_KEY is required. Set it in your .env file.")
 
     _gemini_model = _settings.gemini_model or "gemini-2.5-flash"
 
@@ -142,9 +134,8 @@ def run_evaluation(
     # so it never falls back to OpenAI embeddings.
     from langchain_community.embeddings import HuggingFaceEmbeddings
     from ragas.embeddings import LangchainEmbeddingsWrapper
-    _hf_embeddings = LangchainEmbeddingsWrapper(
-        HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-    )
+
+    _hf_embeddings = LangchainEmbeddingsWrapper(HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2"))
     for metric in metric_objs:
         if hasattr(metric, "embeddings"):
             metric.embeddings = _hf_embeddings
@@ -162,6 +153,7 @@ def run_evaluation(
 
     import logging as _logging
     import math as _math
+
     _logger = _logging.getLogger(__name__)
 
     try:
@@ -197,8 +189,6 @@ def run_evaluation(
         "per_sample": per_sample,
         "skipped_metrics": skipped,
         "skip_reason": (
-            "ground_truths not provided — context_precision and context_recall require reference"
-            if skipped
-            else None
+            "ground_truths not provided — context_precision and context_recall require reference" if skipped else None
         ),
     }

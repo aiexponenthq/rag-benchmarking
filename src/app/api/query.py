@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import functools
-from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -31,9 +30,7 @@ def get_rag_engine() -> RAGEngine:
 
 
 @router.post("/query", response_model=QueryResponse)
-async def post_query(
-    req: QueryRequest, engine: RAGEngine = Depends(get_rag_engine)
-) -> QueryResponse:
+async def post_query(req: QueryRequest, engine: RAGEngine = Depends(get_rag_engine)) -> QueryResponse:
     """Async query endpoint.
 
     ``RAGEngine.query()`` calls sentence-transformers (CPU-bound / sync) and
@@ -58,9 +55,7 @@ async def post_query(
     # attribute may be a Mock object rather than a dict.
     _raw = getattr(getattr(engine, "llm", None), "_last_token_usage", None)
     last_usage: dict[str, int] = (
-        _raw
-        if isinstance(_raw, dict)
-        else {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        _raw if isinstance(_raw, dict) else {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
     )
 
     return QueryResponse(

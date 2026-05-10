@@ -45,7 +45,8 @@ async def post_evaluate(req: EvalRequest, _: str | None = Depends(get_api_key)) 
     the FastAPI event loop.
     """
     from harness.runner import EvaluationRunner
-    from harness.schemas import EvalSample as HarnessEvalSample, RunConfig
+    from harness.schemas import EvalSample as HarnessEvalSample
+    from harness.schemas import RunConfig
 
     loop = asyncio.get_running_loop()
     try:
@@ -55,7 +56,7 @@ async def post_evaluate(req: EvalRequest, _: str | None = Depends(get_api_key)) 
                 question=s.question,
                 contexts=s.contexts,
                 answer=s.answer,
-                ground_truth=s.ground_truths[0] if s.ground_truths else None,
+                ground_truths=s.ground_truths,
             )
             for s in req.samples
         ]
@@ -75,7 +76,11 @@ async def post_evaluate(req: EvalRequest, _: str | None = Depends(get_api_key)) 
         }
 
         paths = write_report_files(
-            {"metrics": result.metrics, "per_sample": {}, "skipped_metrics": result.skipped_metrics},
+            {
+                "metrics": result.metrics,
+                "per_sample": {},
+                "skipped_metrics": result.skipped_metrics,
+            },
             out_json=Path(req.out_json) if req.out_json else None,
             out_md=Path(req.out_md) if req.out_md else None,
         )
@@ -88,9 +93,7 @@ async def post_evaluate(req: EvalRequest, _: str | None = Depends(get_api_key)) 
 
 class AgentEvalRequest(BaseModel):
     trace: AgentTrace
-    metrics: list[str] = Field(
-        default=["source_attribution_accuracy", "agent_faithfulness", "tool_call_accuracy"]
-    )
+    metrics: list[str] = Field(default=["source_attribution_accuracy", "agent_faithfulness", "tool_call_accuracy"])
 
 
 @router.post("/evaluate/agent")
@@ -101,19 +104,19 @@ async def post_evaluate_agent(
     """Evaluate an agentic RAG trace using agentic-specific metrics."""
     import re
 
-    from app.eval.agentic_metrics import source_attribution_accuracy
     from app.eval.agentic_llm_metrics import (
         compute_agent_faithfulness,
         compute_retrieval_necessity,
         compute_tool_call_accuracy,
     )
+    from app.eval.agentic_metrics import source_attribution_accuracy
 
     scores: dict[str, float] = {}
     details: dict[str, Any] = {}
 
     for metric in request.metrics:
         if metric == "source_attribution_accuracy":
-            cited = re.findall(r'\[source:\s*([^\]]+)\]', request.trace.final_answer)
+            cited = re.findall(r"\[source:\s*([^\]]+)\]", request.trace.final_answer)
             retrieved = [c.source_id for c in request.trace.retrieved_chunks]
             r = source_attribution_accuracy(cited, retrieved)
             scores[metric] = r["score"]

@@ -13,9 +13,7 @@ Run with:
 
 from __future__ import annotations
 
-import json
 import pathlib
-import tempfile
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -150,9 +148,7 @@ class TestResultStore:
         # Slightly different second run
         result2 = dict(fake_ragas_result)
         result2["metrics"] = {k: v - 0.05 for k, v in fake_ragas_result["metrics"].items()}
-        result2["per_sample"] = {
-            k: [v - 0.05 for v in vs] for k, vs in fake_ragas_result["per_sample"].items()
-        }
+        result2["per_sample"] = {k: [v - 0.05 for v in vs] for k, vs in fake_ragas_result["per_sample"].items()}
         result_store.save_run(result2, golden_samples, run_id="run-B")
 
         comparison = result_store.compare_runs(["run-A", "run-B"])
@@ -202,14 +198,13 @@ class TestRagasRunner:
     than at ``app.eval.ragas_runner.evaluate``.
     """
 
-    def test_skips_retrieval_metrics_without_ground_truth(
-        self, minimal_sample: dict[str, Any]
-    ) -> None:
+    def test_skips_retrieval_metrics_without_ground_truth(self, minimal_sample: dict[str, Any]) -> None:
         """When ground_truths is empty, context_precision and context_recall are skipped."""
-        from app.eval import ragas_runner as rr
         import os
 
         import pandas as pd
+
+        from app.eval import ragas_runner as rr
 
         os.environ.setdefault("GEMINI_API_KEY", "test-key")
 
@@ -219,9 +214,7 @@ class TestRagasRunner:
             patch("ragas.llms.LangchainLLMWrapper"),
         ):
             mock_eval.return_value = MagicMock(
-                to_pandas=lambda: pd.DataFrame(
-                    [{"faithfulness": 0.9, "answer_relevancy": 0.88}]
-                )
+                to_pandas=lambda: pd.DataFrame([{"faithfulness": 0.9, "answer_relevancy": 0.88}])
             )
             result = rr.run_evaluation([minimal_sample])
 
@@ -230,13 +223,13 @@ class TestRagasRunner:
         assert "context_precision" in result["skipped_metrics"]
         assert "context_recall" in result["skipped_metrics"]
 
-    def test_includes_retrieval_metrics_with_ground_truth(
-        self, full_sample: dict[str, Any]
-    ) -> None:
+    def test_includes_retrieval_metrics_with_ground_truth(self, full_sample: dict[str, Any]) -> None:
         """When ground_truths is present, all four metrics are requested."""
-        from app.eval import ragas_runner as rr
         import os
+
         import pandas as pd
+
+        from app.eval import ragas_runner as rr
 
         os.environ.setdefault("GEMINI_API_KEY", "test-key")
 
@@ -265,8 +258,9 @@ class TestRagasRunner:
 
     def test_raises_without_gemini_key(self, full_sample: dict[str, Any]) -> None:
         """RuntimeError raised when GEMINI_API_KEY is absent."""
-        from app.eval import ragas_runner as rr
         import os
+
+        from app.eval import ragas_runner as rr
 
         saved = os.environ.pop("GEMINI_API_KEY", None)
         try:
@@ -276,13 +270,13 @@ class TestRagasRunner:
             if saved:
                 os.environ["GEMINI_API_KEY"] = saved
 
-    def test_field_translation_question_to_user_input(
-        self, full_sample: dict[str, Any]
-    ) -> None:
+    def test_field_translation_question_to_user_input(self, full_sample: dict[str, Any]) -> None:
         """Samples keyed as 'question'/'contexts'/'answer' are translated to SingleTurnSample."""
-        from app.eval import ragas_runner as rr
         import os
+
         import pandas as pd
+
+        from app.eval import ragas_runner as rr
 
         os.environ.setdefault("GEMINI_API_KEY", "test-key")
         captured_dataset: list[Any] = []

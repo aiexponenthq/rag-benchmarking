@@ -34,7 +34,7 @@ class RAGEngine:
 
     def query(self, query: str, top_k: int, rerank: bool) -> RAGResult:
         """
-        Execute the full RAG pipeline including retrieval, reranking, generation, 
+        Execute the full RAG pipeline including retrieval, reranking, generation,
         and optional retry.
         """
         timings: dict[str, float] = {}
@@ -76,9 +76,7 @@ class RAGEngine:
             from app.quality.self_check import compute_groundedness
 
             with timer() as t_sc:
-                groundedness = compute_groundedness(
-                    answer, [c.get("text", "") for c in current_chunks]
-                )
+                groundedness = compute_groundedness(answer, [c.get("text", "") for c in current_chunks])
             timings["self_check"] = t_sc["elapsed_ms"]
         except Exception:
             pass
@@ -89,7 +87,6 @@ class RAGEngine:
             and groundedness < self.settings.self_check_min_groundedness
             and self.settings.self_check_retry
         ):
-
             logger.info(
                 "Groundedness below threshold, attempting retry",
                 extra={
@@ -125,22 +122,14 @@ class RAGEngine:
             for c in current_chunks
         ]
 
-        return RAGResult(
-            answer=answer, citations=citations, timings=timings, groundedness=groundedness
-        )
+        return RAGResult(answer=answer, citations=citations, timings=timings, groundedness=groundedness)
 
     def _call_llm(self, query: str, chunks: list[dict[str, Any]]) -> str:
-        context_blocks = "\n\n".join(
-            [f"[source: {c.get('source_id','')}]\n{c.get('text','')}" for c in chunks]
-        )
-        user_prompt = self.settings.user_prompt_template.format(
-            context_blocks=context_blocks, query=query
-        )
+        context_blocks = "\n\n".join([f"[source: {c.get('source_id', '')}]\n{c.get('text', '')}" for c in chunks])
+        user_prompt = self.settings.user_prompt_template.format(context_blocks=context_blocks, query=query)
         return self.llm.generate(self.settings.system_prompt, user_prompt)
 
-    def _retry_workflow(
-        self, query: str, top_k: int, rerank: bool, current_score: float
-    ) -> dict[str, Any] | None:
+    def _retry_workflow(self, query: str, top_k: int, rerank: bool, current_score: float) -> dict[str, Any] | None:
         timings = {}
 
         # Expand retrieval
@@ -172,9 +161,7 @@ class RAGEngine:
             from app.quality.self_check import compute_groundedness
 
             with timer() as t_sc:
-                groundedness = compute_groundedness(
-                    answer, [c.get("text", "") for c in more_chunks]
-                )
+                groundedness = compute_groundedness(answer, [c.get("text", "") for c in more_chunks])
             timings["self_check_retry"] = t_sc["elapsed_ms"]
         except Exception:
             return None

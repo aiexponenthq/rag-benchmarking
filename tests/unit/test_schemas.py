@@ -1,10 +1,16 @@
-import pytest
 import uuid
+
+import pytest
 from pydantic import ValidationError
+
 from harness.schemas import (
-    EvalSample, AgentTrace, ToolCall, ReasoningStep,
-    RetrievedChunk, EvalResult, BenchmarkReport, RunConfig
+    AgentTrace,
+    BenchmarkReport,
+    EvalSample,
+    RunConfig,
+    ToolCall,
 )
+
 
 def test_eval_sample_minimal():
     s = EvalSample(
@@ -15,6 +21,7 @@ def test_eval_sample_minimal():
     assert s.sample_id is not None
     uuid.UUID(s.sample_id)  # raises ValueError if not a valid UUID
     assert s.ground_truth is None
+
 
 def test_eval_sample_with_ground_truth():
     s = EvalSample(
@@ -27,9 +34,47 @@ def test_eval_sample_with_ground_truth():
     )
     assert s.relevant_doc_ids == ["doc-1", "doc-2"]
 
+
 def test_eval_sample_requires_question():
     with pytest.raises(ValidationError):
         EvalSample(question="", contexts=["ctx"], answer="ans")
+
+
+def test_eval_sample_legacy_singular_kwarg_promoted():
+    """Backward-compat: EvalSample(ground_truth="x") promotes to plural list."""
+    s = EvalSample(
+        question="q",
+        contexts=["c"],
+        answer="a",
+        ground_truth="legacy-single",
+    )
+    assert s.ground_truths == ["legacy-single"]
+    assert s.ground_truth == "legacy-single"  # legacy property accessor
+
+
+def test_agent_trace_legacy_singular_kwarg_promoted():
+    """Regression test for RB-NEW1: AgentTrace(ground_truth="x") must promote to
+    plural list (the EvalSample shim was applied, the AgentTrace shim was
+    initially missed and silently dropped the kwarg)."""
+    t = AgentTrace(
+        question="q",
+        final_answer="a",
+        ground_truth="legacy-single",
+    )
+    assert t.ground_truths == ["legacy-single"]
+    assert t.ground_truth == "legacy-single"  # legacy property accessor
+
+
+def test_agent_trace_plural_kwarg():
+    """AgentTrace(ground_truths=[...]) is the canonical shape."""
+    t = AgentTrace(
+        question="q",
+        final_answer="a",
+        ground_truths=["one", "two"],
+    )
+    assert t.ground_truths == ["one", "two"]
+    assert t.ground_truth == "one"  # accessor returns first element
+
 
 def test_agent_trace_minimal():
     t = AgentTrace(
@@ -47,6 +92,7 @@ def test_agent_trace_minimal():
     assert len(t.tool_calls) == 1
     assert t.conversation_history == []
 
+
 def test_benchmark_report_score_range():
     report = BenchmarkReport(
         run_id="run-001",
@@ -55,10 +101,12 @@ def test_benchmark_report_score_range():
     )
     assert 0.0 <= report.metrics["faithfulness"] <= 1.0
 
+
 def test_run_config_defaults():
     config = RunConfig(metrics=["faithfulness"])
-    assert config.judge_model == "gemini-1.5-flash"
+    assert config.judge_model == "gemini-2.5-flash"
     assert config.metric_group is None
+
 
 def test_eval_sample_unique_ids():
     s1 = EvalSample(question="Q1?", contexts=["ctx"], answer="A1.")

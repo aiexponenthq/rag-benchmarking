@@ -40,11 +40,11 @@ from __future__ import annotations
 import json
 import sqlite3
 import uuid
+from collections.abc import Generator
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Generator
-
+from typing import Any
 
 _DEFAULT_DB = Path("eval_results.db")
 
@@ -129,15 +129,14 @@ class ResultStore:
             The run_id used.
         """
         run_id = run_id or str(uuid.uuid4())
-        now = datetime.now(tz=timezone.utc).isoformat()
+        now = datetime.now(tz=UTC).isoformat()
         agg_metrics: dict[str, float] = result.get("metrics", {})
         per_sample: dict[str, list[float]] = result.get("per_sample", {})
         skipped: list[str] = result.get("skipped_metrics", [])
 
         with self._conn() as conn:
             conn.execute(
-                "INSERT INTO runs (run_id, created_at, metrics, n_samples, skipped) "
-                "VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO runs (run_id, created_at, metrics, n_samples, skipped) VALUES (?, ?, ?, ?, ?)",
                 (
                     run_id,
                     now,
@@ -184,8 +183,7 @@ class ResultStore:
         """Return summary rows for recent runs, newest first."""
         with self._conn() as conn:
             rows = conn.execute(
-                "SELECT run_id, created_at, metrics, n_samples, skipped "
-                "FROM runs ORDER BY id DESC LIMIT ?",
+                "SELECT run_id, created_at, metrics, n_samples, skipped FROM runs ORDER BY id DESC LIMIT ?",
                 (limit,),
             ).fetchall()
         return [
@@ -202,9 +200,7 @@ class ResultStore:
     def get_run(self, run_id: str) -> dict[str, Any] | None:
         """Return full detail for a single run including per-sample scores."""
         with self._conn() as conn:
-            run_row = conn.execute(
-                "SELECT * FROM runs WHERE run_id = ?", (run_id,)
-            ).fetchone()
+            run_row = conn.execute("SELECT * FROM runs WHERE run_id = ?", (run_id,)).fetchone()
             if run_row is None:
                 return None
 

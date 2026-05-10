@@ -1,12 +1,14 @@
 import json
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-from harness.schemas import AgentTrace, ToolCall, ReasoningStep, RetrievedChunk
+
 from app.eval.agentic_llm_metrics import (
     compute_agent_faithfulness,
-    compute_tool_call_accuracy,
     compute_retrieval_necessity,
+    compute_tool_call_accuracy,
 )
+from harness.schemas import AgentTrace, ReasoningStep, RetrievedChunk, ToolCall
 
 
 def make_trace():
@@ -39,33 +41,41 @@ def make_trace():
     )
 
 
-MOCK_FAITHFUL_RESPONSE = json.dumps({
-    "step_analysis": [
-        {"step_index": 0, "claims": ["August 2025"], "supported": [True], "faithfulness_score": 1.0}
-    ],
-    "trace_faithfulness_score": 1.0,
-    "worst_step": 0,
-    "critical_hallucinations": [],
-})
+MOCK_FAITHFUL_RESPONSE = json.dumps(
+    {
+        "step_analysis": [{"step_index": 0, "claims": ["August 2025"], "supported": [True], "faithfulness_score": 1.0}],
+        "trace_faithfulness_score": 1.0,
+        "worst_step": 0,
+        "critical_hallucinations": [],
+    }
+)
 
-MOCK_TOOL_RESPONSE = json.dumps({
-    "tool_evaluations": [
-        {
-            "step_index": 0, "tool_name": "retrieve",
-            "necessary": True, "correct_tool": True,
-            "input_quality": 1.0, "score": 1.0, "reason": "Correct retrieval"
-        }
-    ],
-    "overall_score": 1.0,
-})
+MOCK_TOOL_RESPONSE = json.dumps(
+    {
+        "tool_evaluations": [
+            {
+                "step_index": 0,
+                "tool_name": "retrieve",
+                "necessary": True,
+                "correct_tool": True,
+                "input_quality": 1.0,
+                "score": 1.0,
+                "reason": "Correct retrieval",
+            }
+        ],
+        "overall_score": 1.0,
+    }
+)
 
-MOCK_NECESSITY_RESPONSE = json.dumps({
-    "necessity": "NECESSARY",
-    "parametric_answer_possible": False,
-    "retrieval_contribution": "essential",
-    "score": 1.0,
-    "reasoning": "Requires specific regulatory date.",
-})
+MOCK_NECESSITY_RESPONSE = json.dumps(
+    {
+        "necessity": "NECESSARY",
+        "parametric_answer_possible": False,
+        "retrieval_contribution": "essential",
+        "score": 1.0,
+        "reasoning": "Requires specific regulatory date.",
+    }
+)
 
 
 def _mock_llm(response: str):

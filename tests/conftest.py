@@ -7,9 +7,9 @@ don't prevent ENFORCE_API_KEY=true from being loaded in tests.
 Solution: Override AppSettings model_config to not read .env during tests,
 and reset the lru_cache before each test so patches take effect.
 """
+
 from __future__ import annotations
 
-import os
 import pytest
 
 
@@ -25,11 +25,13 @@ def disable_api_key_enforcement(monkeypatch):
 
     # Clear the lru_cache so AppSettings re-reads from environment
     from app.config.settings import get_settings
+
     get_settings.cache_clear()
 
     # Patch AppSettings to not read .env file during tests
-    from app.config import settings as settings_module
     from pydantic_settings import SettingsConfigDict
+
+    from app.config import settings as settings_module
 
     original_config = settings_module.AppSettings.model_config
     settings_module.AppSettings.model_config = SettingsConfigDict(

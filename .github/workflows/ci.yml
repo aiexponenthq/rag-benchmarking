@@ -26,7 +26,16 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install -e ".[test]"
+        run: pip install -e ".[test,lint]"
+
+      - name: Lint (ruff check)
+        run: python -m ruff check src tests
+
+      - name: Format (ruff format --check)
+        run: python -m ruff format --check src tests
+
+      - name: Type check (mypy, non-blocking for v1.0)
+        run: python -m mypy src || true
 
       - name: Unit tests
         run: python -m pytest tests/unit/ -v

@@ -10,6 +10,15 @@ concurrency:
   group: publish-${{ github.ref }}
   cancel-in-progress: true
 
+# Hardened 2026-05-10 to RiskForge parity per Top-N=4 audit C-0.2:
+#  - SBOM (CycloneDX) generated at build time
+#  - Sigstore build-provenance attestation
+#  - GitHub Release created with wheel + sdist + sbom artefacts
+permissions:
+  id-token: write       # PyPI OIDC trusted publishing + Sigstore attestation
+  contents: write       # GitHub Release creation
+  attestations: write   # Build provenance attestation
+
 jobs:
   build:
     name: Build distribution
@@ -25,11 +34,24 @@ jobs:
           pip install build
       - name: Build sdist and wheel
         run: python -m build
+      - name: List built artifacts
+        run: ls -lh dist/
+      - name: Generate CycloneDX SBOM
+        run: |
+          pip install "cyclonedx-bom<5"
+          cyclonedx-py environment -o sbom.cdx.json --format json || \
+          cyclonedx-py environment > sbom.cdx.json || true
+      - name: Attest build provenance (GitHub + Sigstore)
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: dist/*
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
           name: python-package-distributions
-          path: dist/
+          path: |
+            dist/
+            sbom.cdx.json
           if-no-files-found: error
 
   publish:
@@ -39,14 +61,33 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/project/rag-benchmarking/
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v8
         with:
           name: python-package-distributions
-          path: dist/
+          path: ./
       - name: Publish to PyPI (OIDC trusted publisher)
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+
+  release:
+    name: GitHub Release
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: python-package-distributions
+          path: ./
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+            sbom.cdx.json

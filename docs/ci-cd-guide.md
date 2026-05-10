@@ -26,7 +26,7 @@ jobs:
       rag-benchmarking:
         image: your-org/rag-benchmarking:latest
         ports:
-          - 5000:5000
+          - 5001:5000
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           API_KEY: ci-test-key
@@ -41,7 +41,7 @@ jobs:
       - name: Wait for server to be ready
         run: |
           for i in {1..30}; do
-            curl -sf http://localhost:5000/health && break
+            curl -sf http://localhost:5001/health && break
             sleep 2
           done
 
@@ -119,7 +119,7 @@ Use the Python SDK (`src/app/sdk/client.py`) to run two configurations against t
 ```python
 from app.sdk.client import RagEval
 
-client = RagEval(api_url="http://localhost:5000", api_key="ci-test-key")
+client = RagEval(api_url="http://localhost:5001", api_key="ci-test-key")
 
 # Load the golden dataset
 import json
@@ -209,6 +209,6 @@ This produces both a machine-readable JSON report and a human-readable Markdown 
 | `GEMINI_API_KEY` | Yes (for LLM metrics) | Judge model API key |
 | `API_KEY` | Yes (if `ENFORCE_API_KEY=true`) | Key for the evaluation server |
 | `ENFORCE_API_KEY` | No | Set `"true"` to require `X-API-Key` on all requests |
-| `HOST_PORT` | No | Override default server port (default: `5000`) |
+| `HOST_PORT` | No | Override host port (default: `5001`) — container internal port stays `5000` |
 
 Store `GEMINI_API_KEY` as a GitHub Actions secret — never hardcode it in workflow files.

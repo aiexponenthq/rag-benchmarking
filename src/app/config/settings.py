@@ -50,9 +50,7 @@ class AppSettings(BaseSettings):
 
     # Prompts
     system_prompt: str = Field(
-        default=(
-            "You are a helpful assistant. Answer based only on the provided context. Cite sources."
-        ),
+        default=("You are a helpful assistant. Answer based only on the provided context. Cite sources."),
         alias="SYSTEM_PROMPT",
     )
     user_prompt_template: str = Field(

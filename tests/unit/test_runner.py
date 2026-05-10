@@ -1,7 +1,9 @@
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import patch, MagicMock
+
 from harness.runner import EvaluationRunner
-from harness.schemas import EvalSample, RunConfig, BenchmarkReport
+from harness.schemas import BenchmarkReport, EvalSample, RunConfig
 
 
 @pytest.fixture
