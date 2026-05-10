@@ -32,11 +32,7 @@ def mean_reciprocal_rank(retrieved_ids: list[str], relevant_ids: set[str]) -> fl
 def ndcg_at_k(retrieved_ids: list[str], relevant_ids: set[str], k: int) -> float:
     """Normalized Discounted Cumulative Gain at K with binary relevance."""
     top_k = retrieved_ids[:k]
-    dcg = sum(
-        1.0 / math.log2(rank + 1)
-        for rank, doc_id in enumerate(top_k, start=1)
-        if doc_id in relevant_ids
-    )
+    dcg = sum(1.0 / math.log2(rank + 1) for rank, doc_id in enumerate(top_k, start=1) if doc_id in relevant_ids)
     ideal_hits = min(len(relevant_ids), k)
     idcg = sum(1.0 / math.log2(rank + 1) for rank in range(1, ideal_hits + 1))
     return dcg / idcg if idcg > 0 else 0.0

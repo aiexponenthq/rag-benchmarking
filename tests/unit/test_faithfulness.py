@@ -1,23 +1,15 @@
 import json
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
+
 from app.eval.faithfulness import compute_faithfulness
 
+MOCK_FULL_SUPPORT = json.dumps({"claims": ["X is true", "Y happened"], "supported": [True, True]})
 
-MOCK_FULL_SUPPORT = json.dumps({
-    "claims": ["X is true", "Y happened"],
-    "supported": [True, True]
-})
+MOCK_PARTIAL_SUPPORT = json.dumps({"claims": ["X is true", "Y happened"], "supported": [True, False]})
 
-MOCK_PARTIAL_SUPPORT = json.dumps({
-    "claims": ["X is true", "Y happened"],
-    "supported": [True, False]
-})
-
-MOCK_NO_CLAIMS = json.dumps({
-    "claims": [],
-    "supported": []
-})
+MOCK_NO_CLAIMS = json.dumps({"claims": [], "supported": []})
 
 MOCK_MALFORMED = "not json at all"
 

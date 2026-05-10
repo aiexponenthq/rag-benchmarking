@@ -14,7 +14,5 @@ class EmbeddingsClient:
         self.model = SentenceTransformer(model_name, device=device)
 
     def embed(self, texts: list[str], *, normalize: bool = True) -> np.ndarray:
-        vectors = self.model.encode(
-            texts, batch_size=32, convert_to_numpy=True, normalize_embeddings=normalize
-        )
+        vectors = self.model.encode(texts, batch_size=32, convert_to_numpy=True, normalize_embeddings=normalize)
         return vectors.astype(np.float32)

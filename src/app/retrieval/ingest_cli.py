@@ -14,9 +14,7 @@ def read_text_file(path: Path) -> str:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Ingest plain text/markdown files into Qdrant Cloud"
-    )
+    parser = argparse.ArgumentParser(description="Ingest plain text/markdown files into Qdrant Cloud")
     parser.add_argument("paths", nargs="+", help="File or directory paths to ingest")
     parser.add_argument("--chunk-size", type=int, default=1000)
     parser.add_argument("--chunk-overlap", type=int, default=150)
@@ -32,9 +30,7 @@ def main() -> None:
         path = Path(p)
         files: list[Path] = []
         if path.is_dir():
-            files = [
-                f for f in path.rglob("*") if f.is_file() and f.suffix.lower() in {".txt", ".md"}
-            ]
+            files = [f for f in path.rglob("*") if f.is_file() and f.suffix.lower() in {".txt", ".md"}]
         elif path.is_file():
             files = [path]
         else:
@@ -62,9 +58,7 @@ def main() -> None:
         desired_vector_name="content",
     )
 
-    payloads = [
-        {"source_id": c.source_id, "chunk_index": c.chunk_index, "text": c.text} for c in all_chunks
-    ]
+    payloads = [{"source_id": c.source_id, "chunk_index": c.chunk_index, "text": c.text} for c in all_chunks]
 
     print("Upserting to Qdrant Cloud ...")
     upsert_points(client, collection_name, vectors, payloads, vector_name=vector_name)

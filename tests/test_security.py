@@ -50,9 +50,7 @@ def test_api_key_security_enforced_mode():
         app.dependency_overrides[get_rag_engine] = lambda: mock_engine
 
         try:
-            resp = client.post(
-                "/v1/query", json={"query": "hi"}, headers={"X-API-Key": "secret-123"}
-            )
+            resp = client.post("/v1/query", json={"query": "hi"}, headers={"X-API-Key": "secret-123"})
             assert resp.status_code == 200
         finally:
             app.dependency_overrides = {}

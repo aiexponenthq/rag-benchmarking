@@ -1,5 +1,6 @@
-import pytest
 from pathlib import Path
+
+import pytest
 from harness.result_store import ResultStore
 from harness.schemas import BenchmarkReport
 

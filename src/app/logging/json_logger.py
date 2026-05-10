@@ -13,9 +13,7 @@ trace_id_var: ContextVar[str | None] = ContextVar("trace_id", default=None)
 class JsonFormatter(jsonlogger.JsonFormatter):
     """JSON formatter that enforces the required logging schema."""
 
-    def add_fields(
-        self, log_record: dict[str, Any], record: logging.LogRecord, message_dict: dict[str, Any]
-    ) -> None:  # noqa: D401
+    def add_fields(self, log_record: dict[str, Any], record: logging.LogRecord, message_dict: dict[str, Any]) -> None:  # noqa: D401
         super().add_fields(log_record, record, message_dict)
         log_record.setdefault("timestamp", self.formatTime(record, self.datefmt))
         log_record.setdefault("level", record.levelname)

@@ -115,9 +115,7 @@ class RagEval:
         resp.raise_for_status()
         return resp.json()
 
-    def compare_runs(
-        self, run_ids: list[str], timeout: int = 30
-    ) -> dict:
+    def compare_runs(self, run_ids: list[str], timeout: int = 30) -> dict:
         """Compare metrics across multiple named runs."""
         resp = requests.post(
             f"{self._url}/v1/runs/compare",
@@ -147,12 +145,8 @@ class RagEval:
         answer = chain_output.get("result") or chain_output.get("answer", "")
         docs = chain_output.get("source_documents", [])
 
-        contexts = [
-            getattr(doc, "page_content", str(doc)) for doc in docs
-        ]
-        retrieved_doc_ids = [
-            getattr(doc, "metadata", {}).get("id", "") for doc in docs
-        ]
+        contexts = [getattr(doc, "page_content", str(doc)) for doc in docs]
+        retrieved_doc_ids = [getattr(doc, "metadata", {}).get("id", "") for doc in docs]
 
         return {
             "question": question,
@@ -180,9 +174,7 @@ class RagEval:
                 text = get_content() if callable(get_content) else str(node)
             contexts.append(text)
 
-        retrieved_doc_ids = [
-            getattr(node, "node_id", "") for node in source_nodes
-        ]
+        retrieved_doc_ids = [getattr(node, "node_id", "") for node in source_nodes]
 
         return {
             "question": question,

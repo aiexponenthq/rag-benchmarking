@@ -59,11 +59,11 @@ Each sample in the JSONL file contains the following fields:
 
 ### Why 50 samples?
 
-50 samples provides enough statistical power for relative comparisons — detecting changes of approximately ±0.05 in metric scores — while remaining fast to evaluate (roughly 2–5 minutes per metric group with Gemini 1.5 Flash as judge). For absolute metric stability, 200+ samples are recommended; this dataset is designed for fast iteration rather than production certification.
+50 samples provides enough statistical power for relative comparisons — detecting changes of approximately ±0.05 in metric scores — while remaining fast to evaluate (roughly 2–5 minutes per metric group with Gemini 2.5 Flash as judge). For absolute metric stability, 200+ samples are recommended; this dataset is designed for fast iteration rather than production certification.
 
 ### Why these domains?
 
-Domains were selected to reflect the primary users of this tool: teams building AI governance and compliance tooling. The EU AI Act domain is particularly relevant given this tool's Article 15 positioning around accuracy, robustness, and cybersecurity requirements for high-risk AI systems.
+Domains were selected to reflect the primary users of this tool: teams building AI governance and compliance tooling. The EU AI Act domain is particularly relevant given this tool's positioning as **partial Article 15(1) accuracy input** for high-risk AI systems. Robustness in the regulatory sense and cybersecurity are out of scope for this harness — those legs of Article 15 require dedicated tooling (see the README scope note).
 
 The selection also covers the full engineering stack (Python/FastAPI, MLOps, Data Engineering) so that platform teams — not just ML researchers — can use the dataset as a meaningful evaluation signal.
 
@@ -88,7 +88,7 @@ Document IDs use the format `{domain_prefix}-{n}` (e.g., `rag-1`, `euai-3`). Eac
 - **English-only** — all questions, contexts, and answers are in English; multilingual RAG systems will require separate domain-specific datasets.
 - **5 samples per domain** — this is insufficient for reliable domain-specific sub-analyses. Treat per-domain breakdowns as directional indicators only.
 - **Single annotator** — ground truth answers were not validated by multiple independent annotators; there may be valid alternative phrasings that would score lower with a strict judge.
-- **Judge-relative scores** — the baseline scores in `docs/benchmark-results.md` are calibrated for Gemini 1.5 Flash at temperature 0.0. Other judge models (GPT-4o, Claude 3.5 Sonnet, etc.) will produce different absolute scores; relative comparisons within the same judge are reliable, cross-judge comparisons are not.
+- **Judge-relative scores** — the baseline scores in `docs/benchmark-results.md` are calibrated for Gemini 2.5 Flash at temperature 0.0. Other judge models (GPT-4o, Claude 3.5 Sonnet, etc.) will produce different absolute scores; relative comparisons within the same judge are reliable, cross-judge comparisons are not.
 - **Static context** — contexts are short, curated passages. Real-world RAG systems dealing with long, noisy documents will typically see lower faithfulness and precision scores.
 
 ---

@@ -4,8 +4,9 @@ import json
 import logging
 from typing import Any
 
-from app.llm.client import LLMClient
 from harness.schemas import AgentTrace
+
+from app.llm.client import LLMClient
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,8 @@ def _call_judge(system: str, user: str) -> dict[str, Any]:
 
 _AGENT_FAITHFULNESS_SYSTEM = """You are evaluating factual consistency across an AI agent's full reasoning trace.
 
-For each reasoning step, verify every factual claim is supported by the tool output at that step or a previously retrieved source.
+For each reasoning step, verify every factual claim is supported by the tool output at that step
+or a previously retrieved source.
 A claim is NOT supported if it appears in the reasoning but not in any tool output, or contradicts the tool output.
 
 Return JSON only:
@@ -82,12 +84,11 @@ def compute_agent_faithfulness(trace: AgentTrace) -> dict:
         }
 
     steps_text = "\n\n".join(
-        f"Step {s.step_index}: {s.thought}\nObservation: {s.observation}"
-        for s in trace.reasoning_steps
+        f"Step {s.step_index}: {s.thought}\nObservation: {s.observation}" for s in trace.reasoning_steps
     )
-    sources_text = "\n\n".join(
-        f"[{c.source_id}]: {c.content}" for c in trace.retrieved_chunks
-    ) or "No explicit chunks provided."
+    sources_text = (
+        "\n\n".join(f"[{c.source_id}]: {c.content}" for c in trace.retrieved_chunks) or "No explicit chunks provided."
+    )
 
     user = f"FULL AGENT TRACE:\n{steps_text}\n\nSOURCES:\n{sources_text}"
     data = _call_judge(_AGENT_FAITHFULNESS_SYSTEM, user)
@@ -110,8 +111,7 @@ def compute_tool_call_accuracy(trace: AgentTrace) -> dict:
         return {"score": 1.0, "tool_evaluations": []}
 
     calls_text = "\n".join(
-        f"Step {tc.step_index}: {tc.tool_name}({tc.tool_input}) → {tc.tool_output[:200]}"
-        for tc in trace.tool_calls
+        f"Step {tc.step_index}: {tc.tool_name}({tc.tool_input}) → {tc.tool_output[:200]}" for tc in trace.tool_calls
     )
     user = (
         f"QUESTION: {trace.question}\n\n"
@@ -136,11 +136,7 @@ def compute_retrieval_necessity(
     High score = retrieval was essential; low score = retrieval was unnecessary.
     """
     context_text = "\n\n".join(contexts)
-    user = (
-        f"QUESTION: {question}\n\n"
-        f"RETRIEVED CONTEXT:\n{context_text}\n\n"
-        f"FINAL ANSWER: {answer}"
-    )
+    user = f"QUESTION: {question}\n\nRETRIEVED CONTEXT:\n{context_text}\n\nFINAL ANSWER: {answer}"
     data = _call_judge(_NECESSITY_SYSTEM, user)
     score = float(data.get("score", 0.0))
     return {

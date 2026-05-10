@@ -47,7 +47,7 @@ sample = {
 }
 
 report = client.evaluate([sample], metrics=["faithfulness", "answer_relevancy"])
-print(report["scores"])
+print(report["metrics"])
 # {"faithfulness": 0.958, "answer_relevancy": 0.810}
 ```
 
@@ -227,34 +227,38 @@ curl -X POST http://localhost:5001/v1/runs/compare \
 
 ---
 
-## EU AI Act Article 15
+## EU AI Act Article 15 — partial input, not conformity evidence
+
+`rag-benchmarking` is an **evaluation harness** that measures **accuracy and faithfulness** for RAG and agentic systems. Those two metrics are *one* input among many that an Article 15 conformity assessment will draw on. They are **not** the conformity assessment itself, and the harness does **not** discharge an Article 15 obligation.
 
 ```mermaid
 graph LR
     RAG["rag-benchmarking\nevaluation harness"]
+    FAITH2["Faithfulness measurement\n(LLM-judge)"]
+    ANS["Answer-relevancy + retrieval metrics\n(deterministic)"]
+    AGENT2["Agentic-trace metrics\n(tool_call_accuracy, source_attribution)"]
+    REPORT2["BenchmarkReport\n→ telemetry input for\nArticle 15(1) accuracy claims"]
 
-    A15["Article 15\nAccuracy · Robustness\nCybersecurity"]
-    FAITH2["Faithfulness testing\n→ measures hallucination rate"]
-    ROBUST["Robustness testing\n→ adversarial + edge case queries"]
-    ATTR["Source attribution\n→ verifies citation accuracy"]
-    REPORT2["BenchmarkReport\n→ audit-ready evidence\nfor Article 15 compliance"]
-
-    RAG --> FAITH2
-    RAG --> ROBUST
-    RAG --> ATTR
-    FAITH2 --> REPORT2
-    ROBUST --> REPORT2
-    ATTR --> REPORT2
-    A15 -.->|"requires"| REPORT2
+    RAG --> FAITH2 --> REPORT2
+    RAG --> ANS --> REPORT2
+    RAG --> AGENT2 --> REPORT2
 
     style RAG fill:#c9a84c,color:#000
-    style A15 fill:#1e3a5f,color:#fff
     style REPORT2 fill:#2d5a2d,color:#fff
 ```
 
-Systematic RAG evaluation produces audit-ready evidence for Article 15's accuracy and robustness requirements.
+### What this tool covers, honestly
 
-> **Scope note — cybersecurity is out of scope.** Article 15 covers three concerns: **accuracy, robustness, and cybersecurity**. `rag-benchmarking` covers the first two. For the cybersecurity leg of Article 15 (adversarial prompt injection, jailbreak resistance, model integrity), pair this tool with a runtime AI security control such as AgentShield. Penalty band for Art. 15 violations: up to **€15M or 3% of global annual turnover** under [Art. 99(4)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689).
+- **Article 15(1) — accuracy declared in instructions for use.** The harness produces faithfulness, answer-relevancy and retrieval-quality metrics that a provider can cite as the empirical basis for the accuracy figures they declare on the system label. The tool does not declare for you, and it does not certify the figures.
+
+### What this tool does NOT cover
+
+- **Article 15 robustness in the regulatory sense.** Robustness under Art. 15 means resilience to errors, faults and inconsistencies — including adversarial-input resilience. This harness has no perturbation generator, no out-of-distribution detector, no adversarial-passage suite. **If a tool tells you it does Art. 15 robustness with a faithfulness scorer, it is overclaiming.**
+- **Article 15 cybersecurity.** Adversarial prompt injection, jailbreak resistance, model-integrity controls. Out of scope. Pair with a runtime AI security control (e.g. AgentShield) for that leg.
+- **Conformity assessment.** Article 15 requires a notified-body conformity assessment for high-risk systems. A benchmark report is not a substitute for that process.
+- **Real-world testing under Art. 60.** The Art. 60 sandboxed-testing regime is a separate procedure with its own supervisory notifications. Out of scope.
+
+> **Penalty band, contextually.** Art. 15 obligations route through the Art. 16 provider-obligation chain to **Art. 99(4)** — up to **€15M or 3% of total worldwide annual turnover, whichever is higher** ([EUR-Lex](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689)). This number is here for context, not as a sales hook. The compliance pathway is broader than this tool.
 
 ---
 

@@ -21,8 +21,8 @@ def ensure_collection(
 ) -> tuple[str, str | None]:
     """Ensure collection exists and return (collection_name, vector_name_if_named).
 
-    If the collection exists, attempt to detect if it uses a named-vector schema and return the 
-    name. If it does not exist, create either a single-vector collection or a named-vector 
+    If the collection exists, attempt to detect if it uses a named-vector schema and return the
+    name. If it does not exist, create either a single-vector collection or a named-vector
     collection if desired_vector_name is provided.
     """
     existing = [c.name for c in client.get_collections().collections]
@@ -38,9 +38,7 @@ def ensure_collection(
                 client.create_collection(
                     collection_name=new_collection,
                     vectors_config={
-                        desired_vector_name: qmodels.VectorParams(
-                            size=vector_size, distance=qmodels.Distance.COSINE
-                        )
+                        desired_vector_name: qmodels.VectorParams(size=vector_size, distance=qmodels.Distance.COSINE)
                     },
                 )
             except Exception:
@@ -53,9 +51,7 @@ def ensure_collection(
         client.create_collection(
             collection_name=collection,
             vectors_config={
-                desired_vector_name: qmodels.VectorParams(
-                    size=vector_size, distance=qmodels.Distance.COSINE
-                )
+                desired_vector_name: qmodels.VectorParams(size=vector_size, distance=qmodels.Distance.COSINE)
             },
         )
         return (collection, desired_vector_name)
@@ -97,9 +93,7 @@ def _detect_named_vector_from_dump(client: QdrantClient, collection: str) -> str
     """Fallback: inspect raw model dump to extract a named vector key if present."""
     info = client.get_collection(collection)
     data = info.model_dump(exclude_none=True)  # type: ignore[attr-defined]
-    vectors = (
-        data.get("config", {}).get("params", {}).get("vectors") if isinstance(data, dict) else None
-    )
+    vectors = data.get("config", {}).get("params", {}).get("vectors") if isinstance(data, dict) else None
     if isinstance(vectors, dict):
         if "size" in vectors:
             return None

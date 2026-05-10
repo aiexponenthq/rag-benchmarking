@@ -2,22 +2,28 @@
 
 ## Summary
 
-| Feature | RAG Benchmarking | RAGAS | TruLens | DeepEval |
-|---|---|---|---|---|
-| **Framework-agnostic** | Yes — any RAG system via adapter | Partial | Partial | Yes |
-| **LangChain adapter** | Yes | Built-in | Built-in | Yes |
-| **LlamaIndex adapter** | Yes | Built-in | Built-in | Yes |
-| **Classic RAG metrics** | Yes (faithfulness, answer_relevancy, context_precision/recall) | Yes | Yes | Yes |
-| **Retrieval metrics** | Yes (Precision@K, Recall@K, MRR, NDCG) | No | Partial | Partial |
-| **Agentic-era metrics** | Yes (4 metrics: agent_faithfulness, tool_call_accuracy, retrieval_necessity, source_attribution) | No | No | Partial |
-| **LLM-as-judge** | Yes (Gemini, OpenAI) | Yes | Yes | Yes |
-| **Deterministic metrics** | Yes (source_attribution_accuracy) | No | No | Yes |
-| **REST API** | Yes (FastAPI, API key auth) | No | No | No |
-| **Python SDK** | Yes | Direct library | Direct library | Direct library |
-| **Run comparison** | Yes (SQLite, /v1/runs/compare) | No | Yes (dashboard) | No |
-| **Self-hosted** | Yes (Docker Compose) | Yes | Yes | Yes |
-| **EU AI Act framing** | Yes (Article 15 mapping) | No | No | No |
-| **Open source** | Yes (Apache 2.0) | Yes (MIT) | Yes (MIT) | Yes (Apache 2.0) |
+| Feature | RAG Benchmarking | RAGAS | TruLens | DeepEval | Promptfoo |
+|---|---|---|---|---|---|
+| **Framework-agnostic** | Yes — any RAG system via adapter | Partial | Partial | Yes | Yes |
+| **LangChain adapter** | Yes | Built-in | Built-in | Yes | Yes |
+| **LlamaIndex adapter** | Yes | Built-in | Built-in | Yes | Partial |
+| **Classic RAG metrics** | Yes (faithfulness, answer_relevancy, context_precision/recall) | Yes | Yes | Yes | Partial |
+| **Retrieval metrics** | Yes (Precision@K, Recall@K, MRR, NDCG) | No | Partial | Partial | No |
+| **Agentic-era metrics** | Yes (4 metrics: agent_faithfulness, tool_call_accuracy, retrieval_necessity, source_attribution) | Partial (Tool call Accuracy per docs.ragas.io) | No | Partial | No |
+| **LLM-as-judge** | Yes (Gemini, OpenAI) | Yes | Yes | Yes | Yes |
+| **Deterministic metrics** | Yes (source_attribution_accuracy) | No | No | Yes | Yes |
+| **REST API** | Yes (FastAPI, API key auth) | No | No | No | No (CLI / yaml) |
+| **Python SDK** | Yes | Direct library | Direct library | Direct library | Yes |
+| **Run comparison** | Yes (SQLite, /v1/runs/compare) | No | Yes (dashboard) | No | Yes (web UI) |
+| **Self-hosted** | Yes (Docker Compose) | Yes | Yes | Yes | Yes |
+| **EU AI Act framing** | Partial Art. 15(1) accuracy input | No | No | No | No |
+| **Open source** | Yes (Apache 2.0) | Yes (Apache 2.0) | Yes (MIT) | Yes (Apache 2.0) | Yes (MIT) |
+
+> **Note (audit 2026-05-10):** RAGAS's stable docs at docs.ragas.io list `Tool call Accuracy`
+> under the *Agents or Tool use cases* section, so the agentic-metrics row is honestly
+> "Partial" rather than "No". An earlier version of this table had RAGAS at "No" — fixed.
+> Promptfoo column added; it is primarily a prompt-evaluation framework with some RAG
+> support, so RAG-specific metrics show up as Partial / No rather than direct competitors.
 
 ---
 
@@ -118,7 +124,7 @@ DeepEval is a testing framework with pytest integration and a large metric libra
 | MRR | ✓ | ✗ | ✗ | ✗ |
 | NDCG | ✓ | ✗ | ✗ | ✗ |
 | Agent Faithfulness | ✓ | ✗ | ✗ | Partial |
-| Tool Call Accuracy | ✓ | ✗ | ✗ | ✓ |
+| Tool Call Accuracy | ✓ | ✓ (per docs.ragas.io) | ✗ | ✓ |
 | Source Attribution | ✓ (deterministic) | ✗ | ✗ | ✗ |
 | Retrieval Necessity | ✓ | ✗ | ✗ | ✗ |
 | Custom metrics | Via plugin | Via custom metrics | Via feedback functions | Via G-Eval |

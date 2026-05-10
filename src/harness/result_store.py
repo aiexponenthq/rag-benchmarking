@@ -52,9 +52,7 @@ class ResultStore:
         """Return a run by ID, or None if not found."""
         with sqlite3.connect(self._db_path) as conn:
             conn.row_factory = sqlite3.Row
-            row = conn.execute(
-                "SELECT * FROM benchmark_runs WHERE run_id = ?", (run_id,)
-            ).fetchone()
+            row = conn.execute("SELECT * FROM benchmark_runs WHERE run_id = ?", (run_id,)).fetchone()
         if row is None:
             return None
         return {
@@ -72,8 +70,7 @@ class ResultStore:
         with sqlite3.connect(self._db_path) as conn:
             conn.row_factory = sqlite3.Row
             rows = conn.execute(
-                "SELECT run_id, created_at, n_samples, metrics "
-                "FROM benchmark_runs ORDER BY created_at DESC LIMIT ?",
+                "SELECT run_id, created_at, n_samples, metrics " "FROM benchmark_runs ORDER BY created_at DESC LIMIT ?",
                 (limit,),
             ).fetchall()
         return [
@@ -95,7 +92,5 @@ class ResultStore:
                 all_metrics.update(r["metrics"].keys())
         comparison: dict[str, list] = {}
         for metric in sorted(all_metrics):
-            comparison[metric] = [
-                (r["metrics"].get(metric) if r else None) for r in runs
-            ]
+            comparison[metric] = [(r["metrics"].get(metric) if r else None) for r in runs]
         return {"run_ids": run_ids, "metrics": comparison}
