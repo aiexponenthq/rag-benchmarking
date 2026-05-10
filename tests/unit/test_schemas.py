@@ -39,6 +39,42 @@ def test_eval_sample_requires_question():
         EvalSample(question="", contexts=["ctx"], answer="ans")
 
 
+def test_eval_sample_legacy_singular_kwarg_promoted():
+    """Backward-compat: EvalSample(ground_truth="x") promotes to plural list."""
+    s = EvalSample(
+        question="q",
+        contexts=["c"],
+        answer="a",
+        ground_truth="legacy-single",
+    )
+    assert s.ground_truths == ["legacy-single"]
+    assert s.ground_truth == "legacy-single"  # legacy property accessor
+
+
+def test_agent_trace_legacy_singular_kwarg_promoted():
+    """Regression test for RB-NEW1: AgentTrace(ground_truth="x") must promote to
+    plural list (the EvalSample shim was applied, the AgentTrace shim was
+    initially missed and silently dropped the kwarg)."""
+    t = AgentTrace(
+        question="q",
+        final_answer="a",
+        ground_truth="legacy-single",
+    )
+    assert t.ground_truths == ["legacy-single"]
+    assert t.ground_truth == "legacy-single"  # legacy property accessor
+
+
+def test_agent_trace_plural_kwarg():
+    """AgentTrace(ground_truths=[...]) is the canonical shape."""
+    t = AgentTrace(
+        question="q",
+        final_answer="a",
+        ground_truths=["one", "two"],
+    )
+    assert t.ground_truths == ["one", "two"]
+    assert t.ground_truth == "one"  # accessor returns first element
+
+
 def test_agent_trace_minimal():
     t = AgentTrace(
         question="What is RAG?",

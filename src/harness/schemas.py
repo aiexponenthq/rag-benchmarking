@@ -106,6 +106,22 @@ class AgentTrace(BaseModel):
     total_latency_ms: float | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
 
+    model_config = {"populate_by_name": True, "extra": "allow"}
+
+    def __init__(self, **data: Any) -> None:
+        # Backwards-compat shim, parity with EvalSample. Without this the
+        # legacy singular kwarg is silently dropped under Pydantic v2 — the
+        # exact contract failure the audit RB-H5 was meant to close.
+        if "ground_truth" in data and "ground_truths" not in data:
+            gt = data.pop("ground_truth")
+            data["ground_truths"] = [gt] if gt else []
+        super().__init__(**data)
+
+    @property
+    def ground_truth(self) -> str | None:
+        """Legacy singular accessor. Returns the first ground_truths entry."""
+        return self.ground_truths[0] if self.ground_truths else None
+
 
 class EvalResult(BaseModel):
     sample_id: str

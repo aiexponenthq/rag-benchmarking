@@ -175,7 +175,7 @@ curl -s -X POST http://localhost:5001/v1/evaluate \
       "question": "What does Article 53 of the EU AI Act require?",
       "contexts": ["Article 53 requires GPAI model providers to publish technical documentation, comply with copyright law, and publish summaries of training data used."],
       "answer": "Article 53 requires GPAI providers to publish technical documentation and training data summaries.",
-      "ground_truth": "Article 53 requires GPAI model providers to publish technical documentation and training data summaries."
+      "ground_truths": ["Article 53 requires GPAI model providers to publish technical documentation and training data summaries."]
     }],
     "metrics": ["faithfulness", "answer_relevancy", "context_precision", "context_recall"]
   }' | python -m json.tool

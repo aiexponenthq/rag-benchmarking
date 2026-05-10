@@ -20,7 +20,7 @@
 
 Bring your own RAG pipeline — LangChain, LlamaIndex, or custom — and benchmark it against classic and agentic-era metrics. Built for teams who need to prove their AI systems work before they ship.
 
-Built by [AI Exponent LLC](https://aiexponent.com). Maps to EU AI Act Article 15 (accuracy requirements).
+Built by [AI Exponent LLC](https://aiexponent.com). Provides **partial Art. 15(1) accuracy input** for high-risk AI systems — not Art. 15 robustness, not cybersecurity, not conformity evidence (see [scope panel](#eu-ai-act-article-15--partial-input-not-conformity-evidence)).
 
 ---
 
