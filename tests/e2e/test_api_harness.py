@@ -63,8 +63,8 @@ def test_agent_eval_endpoint_source_attribution(client):
     resp = client.post("/v1/evaluate/agent", json=payload, headers=HEADERS)
     assert resp.status_code == 200
     data = resp.json()
-    assert "scores" in data
-    assert "source_attribution_accuracy" in data["scores"]
+    assert "metrics" in data
+    assert "source_attribution_accuracy" in data["metrics"]
     assert "trace_id" in data
 
 

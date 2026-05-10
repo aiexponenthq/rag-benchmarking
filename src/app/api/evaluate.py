@@ -146,8 +146,14 @@ async def post_evaluate_agent(
             scores[metric] = r["score"]
             details[metric] = r
 
+    # v1.0.1 audit RB-NEW3: renamed `scores` → `metrics` to match the
+    # /v1/evaluate sibling endpoint shape (which has always emitted
+    # `metrics`). Sibling-endpoint contract drift was the only remaining
+    # API contract issue in the v1.0.0 audit. CHANGELOG documents this
+    # as the one breaking change in v1.0.1; consumers reading
+    # `r["scores"]` should switch to `r["metrics"]`.
     return {
-        "scores": scores,
+        "metrics": scores,
         "details": details,
         "trace_id": request.trace.trace_id,
     }

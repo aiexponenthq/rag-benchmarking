@@ -161,7 +161,7 @@ Because these are deterministic, you can use strict equality assertions in CI:
 with open("reports/retrieval-results.json") as f:
     results = json.load(f)
 
-assert results["scores"]["precision_at_k"] >= 0.65, \
+assert results["metrics"]["precision_at_k"] >= 0.65, \
     f"Retrieval precision dropped: {results['scores']['precision_at_k']:.3f}"
 ```
 
@@ -176,7 +176,7 @@ report = client.evaluate(
     samples,
     metrics=["source_attribution_accuracy"]
 )
-score = report["scores"]["source_attribution_accuracy"]
+score = report["metrics"]["source_attribution_accuracy"]
 assert score >= 0.95, \
     f"Agent is hallucinating source citations: attribution accuracy = {score:.3f}"
 ```
